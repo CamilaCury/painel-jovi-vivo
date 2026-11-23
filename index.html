@@ -684,11 +684,6 @@
   table.bv tr.bv-tot td.bv-act b{background:transparent;}
   table.bv tr.bv-tot td.bv-act .bv-up{color:#9FF0C9 !important;}
   table.bv .bv-of{font-size:9px; opacity:.7;}
-  table.bv .bv-ns{color:#8A8A90; font-weight:600; font-size:9px;}
-  table.bv tr.bv-tot .bv-ns{color:#D6D6DA;}
-  table.bv td.bv-branch.bv-ok{background:#1A7F55;} table.bv td.bv-branch.bv-mid{background:#B7791F;} table.bv td.bv-branch.bv-bad{background:#B42A24;}
-  table.bv .bv-bst{font-size:9.5px; font-weight:600; opacity:.95; margin-top:2px;}
-  table.bv-meta td{padding:4px 8px; font-size:11.5px;} table.bv-meta thead th{font-size:10px; max-width:none; padding:6px 6px;} table.bv-meta td.bv-ach{min-width:70px;}
   .bv-ov .bv-pot{background:#F7F1FB;}
   .oj-pers{display:flex; flex-direction:column; gap:5px; margin-top:8px;}
   .oj-per{display:grid; grid-template-columns:96px 1fr 52px; gap:8px; align-items:center;}
@@ -1263,7 +1258,6 @@
         <button class="tab-btn" data-view="eamercado">Sell Out Retail Vivo</button>
         <button class="tab-btn" data-view="relvivo">Relatório Vivo</button>
         <button class="tab-btn" data-view="branchview">Branch × Meta</button>
-        <button class="tab-btn" data-view="meta">META</button>
         <button class="tab-btn" data-view="abastecimento">Sugestão de Envio</button>
         <button class="tab-btn" data-view="clustererrado">Fora do Cluster</button>
         <button class="tab-btn" data-view="regional">Comparativo Regionais</button>
@@ -2116,6 +2110,7 @@
         <div class="panel-note" id="bv-note"></div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+        <div class="mt-seg" id="bv-month"></div>
         <button class="btn-toggle" id="bv-sum-toggle" type="button" aria-pressed="false" title="Mostra ou esconde o resumo em texto, com seletor de semana">Resumo</button>
         <button class="btn-toggle" id="bv-fit" type="button" aria-pressed="true">Ajustar à largura da tela</button>
         <button class="mt-open" id="bv-metas" type="button">🎯 Metas do mês</button>
@@ -2141,15 +2136,6 @@
     <div id="bv-wrap"><table class="bv" id="bv-table"></table></div>
     <div class="bv-overall" id="bv-overall"></div>
     <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 ou sem venda (999).</div>
-  </div>
-
-  <div class="view" id="view-meta">
-    <div class="panel-head" style="margin-bottom:10px;">
-      <div class="panel-title">META · sell out vs target por branch e modelo</div>
-      <div class="panel-note" id="mt2-note"></div>
-    </div>
-    <div id="mt2-wrap" style="border:1px solid var(--line-2); border-radius:var(--radius-m); overflow:auto; background:#fff;"><table class="bv bv-meta" id="mt2-table"></table></div>
-    <div class="panel-note" style="margin-top:8px;">Os targets são os mesmos da aba <b>Branch × Meta</b> (pode editar aqui ou lá; os botões Metas do mês / Enviar meta ficam lá). A cor do nome do branch mostra a projeção do mês vs target: verde ≥ 100%, amarelo 85–99%, vermelho &lt; 85%. Target 0 aparece como "sem meta".</div>
   </div>
 
   <div class="view" id="view-metodo">
@@ -4178,7 +4164,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ['Ruptura', ['clmod','rupevol','ruptura']],
       ['Estoque', ['estoquemodelo','detalhelojas','estcore','estparado','clustererrado','abastecimento','cd','acessorios']],
       ['Planejamento', ['lanc','sop']],
-      ['Regionais', ['relvivo','regional','branchview','meta']],
+      ['Regionais', ['relvivo','regional','branchview']],
       ['Canais', ['revendas','eamercado','ecommerce']],
       ['Concorrência', ['oppojovi']],
       ['ⓘ Legenda', ['metodo']],
@@ -8339,15 +8325,18 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
                  NE:{'V70':16,'Y21 5G':19,'X300Ultra':0,'X300FE':1}, N:{'V70':10,'Y21 5G':19,'X300Ultra':0,'X300FE':0} },
   };
   function bvDefaults(lab){ const sd = BV_TARGET_SEED[lab || (DATA && DATA.meta.month_label)]; return JSON.parse(JSON.stringify(sd || BV_TARGET_DEFAULT)); }
-  let bvTargets = null;
+  let bvTargets = null, bvMonth = null;
   let bvSumSel = null, bvSumOpen = false;
-  function bvLoadTargets(){
-    if(bvTargets) return bvTargets;
-    bvTargets = bvDefaults();
-    try{ const sv = JSON.parse(localStorage.getItem('bv_targets_vivo_'+DATA.meta.month_label)||'null'); const seeded = !!BV_TARGET_SEED[DATA.meta.month_label]; if(sv) Object.keys(sv).forEach(b=>{ const o = bvTargets[b]||(bvTargets[b]={}); Object.entries(sv[b]||{}).forEach(([m,v])=>{ if(!seeded || +v>0) o[m] = v; }); }); }catch(e){}
-    return bvTargets;
+  function bvMon(){ return bvMonth || DATA.meta.month_label; }
+  function bvLoadTargets(lab){
+    lab = lab || bvMon(); const cur = lab===bvMon();
+    if(cur && bvTargets) return bvTargets;
+    const t = bvDefaults(lab);
+    try{ const sv = JSON.parse(localStorage.getItem('bv_targets_vivo_'+lab)||'null'); const seeded = !!BV_TARGET_SEED[lab]; if(sv) Object.keys(sv).forEach(b=>{ const o = t[b]||(t[b]={}); Object.entries(sv[b]||{}).forEach(([m,v])=>{ if(!seeded || +v>0) o[m] = v; }); }); }catch(e){}
+    if(cur) bvTargets = t;
+    return t;
   }
-  function bvSaveTargets(){ try{ localStorage.setItem('bv_targets_vivo_'+DATA.meta.month_label, JSON.stringify(bvTargets)); }catch(e){} }
+  function bvSaveTargets(){ try{ localStorage.setItem('bv_targets_vivo_'+bvMon(), JSON.stringify(bvTargets)); }catch(e){} }
   function bvIsoWeek(iso){ return Number(isoWeekLabel(iso).slice(1)); }
   function bvDot(dos, stock){
     let c, v;
@@ -8359,20 +8348,27 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   function renderBranchView(){
     const host = document.getElementById('bv-table'); if(!host) return;
     const T = bvLoadTargets();
-    const REFISO = DATA.meta.reference_date;
-    const [ry,rm] = REFISO.split('-').map(Number);
-    const monthStart = `${ry}-${String(rm).padStart(2,'0')}-01`;
+    const REF0 = DATA.meta.reference_date;
+    const MON = bvMon(); const [rm,ry] = MON.split('/').map(Number);
+    const monthStart = `${ry}-${String(rm).padStart(2,'0')}-01`, monthEnd = new Date(Date.UTC(ry,rm,0)).toISOString().slice(0,10);
+    const REFISO = monthEnd<REF0 ? monthEnd : REF0;
+    // filtro de mês
+    { const el = document.getElementById('bv-month'); if(el){ const MESN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const first = (DATA.devSales||[]).reduce((a,x)=>x.d<a?x.d:a, REF0); const L=[]; let [fy,fm]=first.split('-').map(Number); const [cy,cm]=REF0.split('-').map(Number);
+      while(fy<cy || (fy===cy && fm<=cm)){ L.push(String(fm).padStart(2,'0')+'/'+fy); fm++; if(fm>12){fm=1;fy++;} }
+      el.innerHTML = '<span style="font-size:11.5px; font-weight:700; color:var(--ink-700); margin:0 6px 0 4px; align-self:center;">Mês</span>'+L.slice(-6).map(l=>`<button type="button" data-m="${l}" class="${l===MON?'on':''}">${MESN[+l.slice(0,2)-1]}${l===DATA.meta.month_label?'':'/'+l.slice(5,7)}</button>`).join('');
+      el.querySelectorAll('button').forEach(bt=>bt.onclick=()=>{ bvMonth = bt.dataset.m===DATA.meta.month_label?null:bt.dataset.m; bvTargets=null; bvSumSel=null; const y=window.scrollY; renderBranchView(); window.scrollTo(0,y); }); } }
     // semanas: as 5 últimas semanas ISO até a data da última venda
     const weeks = []; { let d = new Date(REFISO+'T00:00:00Z'); const dow=(d.getUTCDay()+6)%7; let mon = new Date(d.getTime()-dow*86400000);
-      for(let i=0;i<5;i++){ const st=new Date(mon.getTime()-i*7*86400000), en=new Date(st.getTime()+6*86400000); weeks.unshift({start:st.toISOString().slice(0,10), end:en.toISOString().slice(0,10), label:'S'+bvIsoWeek(st.toISOString().slice(0,10))}); } }
-    const w4Start = weeks[1].start, w4End = weeks[4].end;
+      for(let i=0;i<4;i++){ const st=new Date(mon.getTime()-i*7*86400000), en=new Date(st.getTime()+6*86400000); weeks.unshift({start:st.toISOString().slice(0,10), end:en.toISOString().slice(0,10), label:'W'+bvIsoWeek(st.toISOString().slice(0,10))}); } }
+    const w4Start = weeks[0].start, w4End = weeks[3].end;
     const w4Days = Math.round((Math.min(new Date(w4End+'T00:00:00Z'), new Date(REFISO+'T00:00:00Z')) - new Date(w4Start+'T00:00:00Z'))/86400000)+1;
     const storeBy = {}; DATA.stores.forEach(s=>storeBy[s.code]=s);
     const sales = DATA.devSales || [];
     const grp = s => s.promotor==='FULL TIME' ? 'FT' : s.promotor==='PART TIME' ? 'PT' : 'NO';
     const GR = [['FT','FULL TIME'],['PT','PART TIME'],['NO','NO PROMOTER']];
     // agrega
-    const A = {}; const blank = ()=>({store:0, tr:0, wh:0, res:0, wk:[0,0,0,0,0], w4:0, g:{FT:{st:0,so:0},PT:{st:0,so:0},NO:{st:0,so:0}}});
+    const A = {}; const blank = ()=>({store:0, tr:0, wh:0, res:0, wk:[0,0,0,0], w4:0, g:{FT:{st:0,so:0},PT:{st:0,so:0},NO:{st:0,so:0}}});
     [...BV_BRANCHES,'TOTAL'].forEach(b=>{ A[b]={}; BV_MODELS.forEach(([,m])=>A[b][m]=blank()); A[b]._stores={FT:0,PT:0,NO:0,all:0}; });
     const mOf = {}; BV_MODELS.forEach(([p,m])=>mOf[p]=m);
     DATA.stores.forEach(s=>{
@@ -8384,10 +8380,10 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     sales.forEach(x=>{ const s=storeBy[x.k]; if(!s || !A[s.regional]) return; const m=mOf[x.p]; if(!m) return;
       [s.regional,'TOTAL'].forEach(k=>{ const c=A[k][m];
         if(x.d>=monthStart && x.d<=REFISO) c.res+=x.q;
-        weeks.forEach((w,i)=>{ if(x.d>=w.start && x.d<=w.end) c.wk[i]+=x.q; });
-        if(x.d>=w4Start && x.d<=w4End){ c.w4+=x.q; c.g[grp(s)].so+=x.q; } }); });
+        weeks.forEach((w,i)=>{ if(x.d>=w.start && x.d<=w.end && x.d<=REFISO) c.wk[i]+=x.q; });
+        if(x.d>=w4Start && x.d<=w4End && x.d<=REFISO){ c.w4+=x.q; c.g[grp(s)].so+=x.q; } }); });
     // ---- ação: ruptura, excesso (>90 dias) e falta (<30 dias) por loja × modelo, somados por branch ----
-    const so4 = {}; sales.forEach(x=>{ if(x.d>=w4Start && x.d<=w4End){ const k=x.k+'|'+x.p; so4[k]=(so4[k]||0)+x.q; } });
+    const so4 = {}; sales.forEach(x=>{ if(x.d>=w4Start && x.d<=w4End && x.d<=REFISO){ const k=x.k+'|'+x.p; so4[k]=(so4[k]||0)+x.q; } });
     const ACT = {}; [...BV_BRANCHES,'TOTAL'].forEach(b=>{ ACT[b]={}; BV_MODELS.forEach(([,m])=>ACT[b][m]={zer:0, clu:0, exc:0, fal:0}); });
     DATA.stores.forEach(s=>{ const b=s.regional; if(!ACT[b]) return;
       BV_MODELS.forEach(([p,m])=>{
@@ -8400,7 +8396,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
           if(inCluster && !PHASE_OUT_PRODUCTS.has(p)){ a.clu++; if(qty<=0) a.zer++; }
           a.exc += exc; a.fal += fal; });
       }); });
-    const dEl = DATA.meta.days_elapsed, dIn = DATA.meta.days_in_month, dLeft = Math.max(0, dIn - dEl);
+    const dIn = new Date(Date.UTC(ry,rm,0)).getUTCDate(), dEl = REFISO===REF0 ? DATA.meta.days_elapsed : dIn, dLeft = Math.max(0, dIn - dEl);
     const actCells = (res, t, a)=>{
       const proj = dEl>0 ? Math.round(res/dEl*dIn) : res;
       const pp = t>0 ? proj/t*100 : null;
@@ -8416,8 +8412,8 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     };
     const actSum = (b)=>BV_MODELS.reduce((acc,[,m])=>{ const a=ACT[b][m]; acc.zer+=a.zer; acc.clu+=a.clu; acc.exc+=a.exc; acc.fal+=a.fal; return acc; }, {zer:0,clu:0,exc:0,fal:0});
     // tendência: última semana vs média das 4 anteriores (só semana fechada)
-    const trend = (wk)=>{ if(weeks[4].end>REFISO) return ''; const avg=(wk[0]+wk[1]+wk[2]+wk[3])/4; if(avg<=0 && wk[4]<=0) return ''; const d = avg>0 ? (wk[4]-avg)/avg*100 : 100;
-      return Math.abs(d)<10 ? '' : `<span class="${d>0?'bv-up':'bv-dn'}" title="${d>0?'+':''}${Math.round(d)}% vs média das 4 semanas anteriores" style="font-size:8.5px; margin-left:2px;">${d>0?'▲':'▼'}</span>`; };
+    const trend = (wk)=>{ if(weeks[3].end>REFISO) return ''; const avg=(wk[0]+wk[1]+wk[2])/3; if(avg<=0 && wk[3]<=0) return ''; const d = avg>0 ? (wk[3]-avg)/avg*100 : 100;
+      return Math.abs(d)<10 ? '' : `<span class="${d>0?'bv-up':'bv-dn'}" title="${d>0?'+':''}${Math.round(d)}% vs média das 3 semanas anteriores" style="font-size:8.5px; margin-left:2px;">${d>0?'▲':'▼'}</span>`; };
     const tgt = (b,m)=> b==='TOTAL' ? BV_BRANCHES.reduce((a,bb)=>a+(+((T[bb]||{})[m])||0),0) : (+((T[b]||{})[m])||0);
     const sumM = (b,f)=>BV_MODELS.reduce((a,[,m])=>a+f(A[b][m],m),0);
     const nat = { tot: sumM('TOTAL',c=>c.store+c.tr), w4: sumM('TOTAL',c=>c.w4) };
@@ -8428,10 +8424,10 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const achCell = (res,t)=>{ const p = t>0 ? res/t*100 : 0; return `<td class="bv-ach"><span class="bv-achbar" style="width:${Math.min(100,p).toFixed(0)}%;"></span><b>${t>0?Math.round(p)+'%':'0%'}</b></td>`; };
 
     let h = `<thead>
-      <tr class="bv-h1"><th rowspan="2">BRANCH</th><th rowspan="2">MODELO</th><th colspan="5">ESTOQUE</th><th colspan="10">SELL OUT vs TARGET</th>
+      <tr class="bv-h1"><th rowspan="2">BRANCH</th><th rowspan="2">MODELO</th><th colspan="5">ESTOQUE</th><th colspan="9">SELL OUT vs TARGET</th>
         <th rowspan="2" style="white-space:normal; max-width:44px;">TOTAL LOJAS</th>${GR.map(([,l])=>`<th colspan="6">${l}</th>`).join('')}<th colspan="3">ANÁLISE</th></tr>
       <tr class="bv-h2"><th>LOJA</th><th>TRÂNSITO</th><th>TOTAL</th><th class="bv-wh">CD</th><th>DoS</th>
-        <th>TARGET</th><th>RESULT</th><th>ACHIEVE</th>${weeks.map(w=>`<th title="${fmtDate(w.start)} a ${fmtDate(w.end>REFISO?REFISO:w.end)}${w.end>REFISO?' (semana em andamento)':''}">${w.label}${w.end>REFISO?'*':''}<div style="font-weight:500; font-size:8.5px; opacity:.85;">${w.start.slice(8,10)}/${w.start.slice(5,7)}</div></th>`).join('')}<th class="bv-wh">TOTAL (4S)</th><th>DoS (4S)</th>
+        <th>TARGET</th><th>RESULT</th><th>ACHIEVE</th>${weeks.map(w=>`<th title="${fmtDate(w.start)} a ${fmtDate(w.end>REFISO?REFISO:w.end)}${w.end>REFISO?(REFISO===REF0?' (semana em andamento)':' (só até o fim do mês)'):''}">${w.label}${w.end>REFISO?'*':''}<div style="font-weight:500; font-size:8.5px; opacity:.85;">${w.start.slice(8,10)}/${w.start.slice(5,7)}</div></th>`).join('')}<th class="bv-wh">TOTAL (4S)</th><th>DoS (4S)</th>
         ${GR.map(()=>`<th>LOJAS</th><th>PROD.</th><th>ESTOQUE</th><th>%</th><th>SELL OUT 4S</th><th>DoS</th>`).join('')}
         <th>% ESTQ</th><th>% SO</th><th>DELTA</th></tr></thead><tbody>`;
     const overall = {FT:{st:0,so:0},PT:{st:0,so:0},NO:{st:0,so:0}};
@@ -8449,7 +8445,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
           ${i===0?`<td rowspan="${BV_MODELS.length+1}" class="bv-branch">${b}</td>`:''}
           <td class="bv-model">${m}</td><td>${fmtInt(c.store)}</td><td>${fmtInt(c.tr)}</td><td><b>${fmtInt(tot)}</b></td><td class="bv-wh">${fmtInt(c.wh)}</td><td class="bv-l">${bvDot(dInv, tot+c.wh)}</td>
           <td>${isT?fmtInt(t):`<input class="bv-in" type="number" min="0" step="1" data-b="${b}" data-m="${m}" value="${t}" aria-label="Target ${b} ${m}">`}</td><td>${fmtInt(c.res)}</td>${achCell(c.res,t)}
-          ${c.wk.map((v,i)=>`<td>${fmtInt(v)}${i===4?trend(c.wk):''}</td>`).join('')}<td class="bv-wh">${fmtInt(c.w4)}</td><td class="bv-l">${bvDot(d4, tot)}</td>
+          ${c.wk.map((v,i)=>`<td>${fmtInt(v)}${i===3?trend(c.wk):''}</td>`).join('')}<td class="bv-wh">${fmtInt(c.w4)}</td><td class="bv-l">${bvDot(d4, tot)}</td>
           ${i===0?`<td rowspan="${BV_MODELS.length}" class="bv-big">${fmtInt(st.all)}</td>`:''}
           ${GR.map(([g])=>{ const x=c.g[g]; const dd=dosOf(x.st,x.so);
             const cells = `<td>${fmtInt(x.st)}</td><td>${pc(x.st,bTot)}</td><td>${fmtInt(x.so)}</td><td class="bv-l">${bvDot(dd,x.st)}</td>`;
@@ -8460,11 +8456,11 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       });
       // linha de total do branch
       const tT = BV_MODELS.reduce((a,[,m])=>a+tgt(b,m),0), rT = sumM(b,c=>c.res), whT = sumM(b,c=>c.wh);
-      const wkT = [0,1,2,3,4].map(i=>sumM(b,c=>c.wk[i]));
+      const wkT = [0,1,2,3].map(i=>sumM(b,c=>c.wk[i]));
       const pInvB = isT?100:(nat.tot>0?bTot/nat.tot*100:0), pSoB = isT?100:(nat.w4>0?bW4/nat.w4*100:0);
       h += `<tr class="bv-tot">
         <td class="bv-model">TOTAL</td><td>${fmtInt(sumM(b,c=>c.store))}</td><td>${fmtInt(sumM(b,c=>c.tr))}</td><td>${fmtInt(bTot)}</td><td>${fmtInt(whT)}</td><td class="bv-l">${bvDot(dosOf(bTot+whT,bW4), bTot+whT)}</td>
-        <td>${fmtInt(tT)}</td><td>${fmtInt(rT)}</td>${achCell(rT,tT)}${wkT.map((v,i)=>`<td>${fmtInt(v)}${i===4?trend(wkT):''}</td>`).join('')}<td>${fmtInt(bW4)}</td><td class="bv-l">${bvDot(dosOf(bTot,bW4), bTot)}</td>
+        <td>${fmtInt(tT)}</td><td>${fmtInt(rT)}</td>${achCell(rT,tT)}${wkT.map((v,i)=>`<td>${fmtInt(v)}${i===3?trend(wkT):''}</td>`).join('')}<td>${fmtInt(bW4)}</td><td class="bv-l">${bvDot(dosOf(bTot,bW4), bTot)}</td>
         <td>${isT?'100%':pc(st.all, A.TOTAL._stores.all)}</td>
         ${GR.map(([g])=>{ const stG=sumM(b,c=>c.g[g].st), soG=sumM(b,c=>c.g[g].so); if(!isT){ overall[g].st+=stG; overall[g].so+=soG; }
           const d = (bW4>0?soG/bW4*100:0) - (bTot>0?stG/bTot*100:0);
@@ -8474,29 +8470,6 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     });
     h += `</tbody>`;
     host.innerHTML = h;
-    // ---- aba META ----
-    const mh = document.getElementById('mt2-table');
-    if(mh){
-      const projOf = r=> dEl>0 ? r/dEl*dIn : r;
-      const pcol = pp=> pp===null ? '' : pp>=100 ? 'color:#1A9463;' : pp>=85 ? 'color:#B7791F;' : 'color:#D2322B;';
-      const mAch = (res,t)=> t>0 ? achCell(res,t) : `<td class="bv-ach"><span class="bv-ns">sem meta</span></td>`;
-      const mCells = (res,t,inp,tot)=>{ const proj=projOf(res), pp=t>0?proj/t*100:null, falta=Math.max(0,t-res), perDay=dLeft>0?falta/dLeft:null;
-        return `<td>${inp}</td><td><b>${fmtInt(res)}</b></td>${mAch(res,t)}<td>${fmtInt(Math.round(proj))}</td><td style="font-weight:700; ${tot&&pp!==null?(pp>=100?'color:#9FF0C9;':pp>=85?'color:#FFE08A;':'color:#FFC2BD;'):pcol(pp)}">${pp===null?'<span class="bv-ns">sem meta</span>':Math.round(pp)+'%'}</td>
-          <td>${t>0?(falta>0?fmtInt(falta):'<span class="bv-up">✓ batida</span>'):'—'}</td><td>${t>0&&falta>0&&perDay!==null?(Math.round(perDay*10)/10).toString().replace('.',','):'—'}</td>`; };
-      let mt = `<thead><tr class="bv-h2"><th>BRANCH</th><th>MODELO</th><th>TARGET</th><th>RESULT</th><th>ACHIEVE</th><th>PROJEÇÃO DO MÊS</th><th>% PROJ. vs TARGET</th><th>FALTA P/ META</th><th>POR DIA (${dLeft} dias restantes)</th></tr></thead><tbody>`;
-      [...BV_BRANCHES,'TOTAL'].forEach(b=>{ const isT=b==='TOTAL';
-        const tTb = BV_MODELS.reduce((a,[,m])=>a+tgt(b,m),0), rTb = sumM(b,c=>c.res);
-        const ppB = tTb>0 ? projOf(rTb)/tTb*100 : null;
-        const bCls = ppB===null ? '' : ppB>=100 ? ' bv-ok' : ppB>=85 ? ' bv-mid' : ' bv-bad';
-        BV_MODELS.forEach(([,m],i)=>{ const t=tgt(b,m), c=A[b][m];
-          mt += `<tr class="${i===0?'bv-first':''}">${i===0?`<td rowspan="${BV_MODELS.length+1}" class="bv-branch${bCls}" title="Projeção ${fmtInt(Math.round(projOf(rTb)))} un. vs target ${fmtInt(tTb)}">${b}<div class="bv-bst">${ppB===null?'sem meta':'proj. '+Math.round(ppB)+'%'}</div></td>`:''}<td class="bv-model">${m}</td>${mCells(c.res,t, isT?fmtInt(t):`<input class="bv-in" type="number" min="0" step="1" data-b="${b}" data-m="${m}" value="${t}" aria-label="Target ${b} ${m}">`)}</tr>`; });
-        mt += `<tr class="bv-tot"><td class="bv-model">TOTAL</td>${mCells(rTb,tTb,fmtInt(tTb),true)}</tr>`; });
-      mh.innerHTML = mt + '</tbody>';
-      const mn = document.getElementById('mt2-note'); if(mn) mn.innerHTML = `Meta de ${DATA.meta.month_label}, sell-out das 70 lojas do cadastro (só aparelhos) até ${fmtDate(REFISO)} · ${dEl} de ${dIn} dias. Projeção = ritmo diário do mês × dias do mês.`;
-      mh.querySelectorAll('input.bv-in').forEach(inp=>inp.addEventListener('change', ()=>{
-        const v = Math.max(0, parseFloat(inp.value)||0); (bvTargets[inp.dataset.b]||(bvTargets[inp.dataset.b]={}))[inp.dataset.m]=v; bvSaveTargets();
-        const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }));
-    }
     // resumo por grupo de promotor + potencial
     const nG = g=>A.TOTAL._stores[g]||0;
     const prodOf = g=> nG(g)>0 ? overall[g].so/nG(g) : 0;
@@ -8513,7 +8486,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         <div><span>Prod. (un./loja em 4S)</span><b>${prodOf(g).toFixed(1).replace('.',',')}</b></div>
         ${potLine(g)}</div>`; }).join('');
     // ---- resumo em texto, da semana escolhida (4 semanas até ela), em português ----
-    const selList = []; for(let i=0;i<12;i++){ const st=new Date(weeks[4].start+'T00:00:00Z'); st.setUTCDate(st.getUTCDate()-7*i); const ss=st.toISOString().slice(0,10);
+    const selList = []; for(let i=0;i<12;i++){ const st=new Date(weeks[3].start+'T00:00:00Z'); st.setUTCDate(st.getUTCDate()-7*i); const ss=st.toISOString().slice(0,10);
       selList.push({start:ss, end:new Date(st.getTime()+6*86400000).toISOString().slice(0,10), label:'W'+bvIsoWeek(ss)}); }
     const selIdx = Math.max(0, selList.findIndex(w=>w.start===bvSumSel));
     const isLatest = selIdx===0;
@@ -8618,8 +8591,8 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       host.innerHTML = `<div class="bv-sum-title">${title}</div>` + S.map(sec=>`<div class="bv-sum-sec"><div class="bv-sum-h">${sec.t}</div>${sec.items.map(i=>`<p>${i.lead?`<b>${i.lead}:</b> `:''}${i.text}</p>`).join('')}</div>`).join('');
     };
     bvSummary();
-    const parcial = weeks[4].end>REFISO;
-    document.getElementById('bv-note').innerHTML = `Sell-out das 70 lojas do cadastro, só aparelhos (sem fones), semana de segunda a domingo. As 5 semanas andam sozinhas: são sempre as últimas 5 até a última venda da base (hoje ${weeks[0].label} a ${weeks[4].label}${parcial?`, a ${weeks[4].label} ainda em andamento (*)`:''}). RESULT = sell-out de ${DATA.meta.month_label} até ${fmtDate(REFISO)}. TOTAL (4S) = ${weeks[1].label} a ${weeks[4].label} (${fmtDate(w4Start)} a ${fmtDate(REFISO)}). DoS (estoque) = (total + CD) ÷ venda média diária das 4 semanas; DoS (4S) e DoS dos promotores = estoque loja + trânsito ÷ venda média diária das 4 semanas. % ESTQ / % SO = participação do branch no total nacional do modelo.`;
+    const parcial = weeks[3].end>REFISO;
+    document.getElementById('bv-note').innerHTML = `${MON!==DATA.meta.month_label?`<b style="color:#660099;">Vendo ${MON} (mês fechado).</b> Estoque, CD e DoS são a posição atual. `:''}Sell-out das 70 lojas do cadastro, só aparelhos (sem fones), semana de segunda a domingo. Mostra as 4 últimas semanas até ${fmtDate(REFISO)} (${weeks[0].label} a ${weeks[3].label}${parcial?`, a ${weeks[3].label} ${REFISO===REF0?'ainda em andamento':'cortada no fim do mês'} (*)`:''}). RESULT = sell-out de ${MON} até ${fmtDate(REFISO)}. TOTAL (4S) = ${weeks[0].label} a ${weeks[3].label} (${fmtDate(w4Start)} a ${fmtDate(REFISO)}). DoS (estoque) = (total + CD) ÷ venda média diária das 4 semanas; DoS (4S) e DoS dos promotores = estoque loja + trânsito ÷ venda média diária das 4 semanas. % ESTQ / % SO = participação do branch no total nacional do modelo.`;
     host.querySelectorAll('input.bv-in').forEach(inp=>inp.addEventListener('change', ()=>{
       const v = Math.max(0, parseFloat(inp.value)||0); (bvTargets[inp.dataset.b]||(bvTargets[inp.dataset.b]={}))[inp.dataset.m]=v; bvSaveTargets();
       const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }));
@@ -8634,7 +8607,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     }
   }
   (function(){ const f=document.getElementById('bv-fit'); if(f) f.addEventListener('click', ()=>{ f.setAttribute('aria-pressed', f.getAttribute('aria-pressed')==='true'?'false':'true'); bvFit(); });
-    const r=document.getElementById('bv-reset'); if(r) r.addEventListener('click', ()=>{ bvTargets=bvDefaults(); bvSaveTargets(); renderBranchView(); });
+    const r=document.getElementById('bv-reset'); if(r) r.addEventListener('click', ()=>{ bvTargets=bvDefaults(bvMon()); bvSaveTargets(); renderBranchView(); });
     const stg=document.getElementById('bv-sum-toggle'); if(stg) stg.addEventListener('click', ()=>{ bvSumOpen=!bvSumOpen; renderBranchView(); });
     const sws=document.getElementById('bv-sum-week'); if(sws) sws.addEventListener('change', ()=>{ bvSumSel=sws.value; const y=window.scrollY; renderBranchView(); window.scrollTo(0,y); });
     const sc=document.getElementById('bv-sum-copy'); if(sc) sc.addEventListener('click', ()=>{
@@ -8659,7 +8632,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ws['!cols'] = [{wch:8}].concat(BV_MODELS.map(()=>({wch:11})));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Meta');
-      saveBlob(`meta_${(DATA.meta.month_label||'').replace('/','-')}.xlsx`, new Blob([XLSX.write(wb,{bookType:'xlsx', type:'array'})]), wb);
+      saveBlob(`meta_${bvMon().replace('/','-')}.xlsx`, new Blob([XLSX.write(wb,{bookType:'xlsx', type:'array'})]), wb);
     });
     const up = document.getElementById('bv-upload'), upInput = document.getElementById('bv-upload-input');
     if(up && upInput){
@@ -8700,7 +8673,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
             bvTargets = targets;
             bvSaveTargets();
             renderBranchView();
-            document.getElementById('status-line').innerHTML = `<b>Meta de ${DATA.meta.month_label} atualizada:</b> ${nRows} branch(es), ${nVals} valores, a partir de ${file.name}.`;
+            document.getElementById('status-line').innerHTML = `<b>Meta de ${bvMon()} atualizada:</b> ${nRows} branch(es), ${nVals} valores, a partir de ${file.name}.`;
           }catch(err){
             window.alert('Não consegui ler o arquivo de meta: ' + err.message + '\n\nUse o botão "Baixar modelo" pra pegar o formato certo.');
             console.error(err);
@@ -8780,7 +8753,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         ov.querySelector('.mt-save').onclick = ()=>{
           const ok = write(curLab, collect());
           if(!ok){ ov.querySelector('#mt-msg').textContent = 'Este navegador bloqueou o salvamento (modo privado?).'; return; }
-          if(curLab===DATA.meta.month_label){ bvTargets = null; const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }
+          if(curLab===bvMon()){ bvTargets = null; const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }
           draw(); ov.querySelector('#mt-msg').textContent = `Meta de ${nice(curLab)} salva.`;
           if(curLab===DATA.meta.month_label) setTimeout(close, 500);
         };
@@ -11672,7 +11645,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const f1 = v=>(Math.round(v*10)/10).toLocaleString(LOC);
     // metas: as mesmas da Visão por Branch (Metas do mês)
     let T = null;
-    if(atual) T = bvLoadTargets(); else { try{ T = JSON.parse(localStorage.getItem('bv_targets_vivo_'+lab)||'null'); }catch(e){} if(!T && BV_TARGET_SEED[lab]) T = bvDefaults(lab); }
+    if(atual) T = bvLoadTargets(DATA.meta.month_label); else { try{ T = JSON.parse(localStorage.getItem('bv_targets_vivo_'+lab)||'null'); }catch(e){} if(!T && BV_TARGET_SEED[lab]) T = bvDefaults(lab); }
     const tgt = (b,m)=> T && T[b] ? (+T[b][m]||0) : 0;
     const MODS = BV_MODELS; const mOf = {}; MODS.forEach(([p,m])=>mOf[p]=m);
     const REGS = BV_BRANCHES;
