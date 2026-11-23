@@ -684,6 +684,11 @@
   table.bv tr.bv-tot td.bv-act b{background:transparent;}
   table.bv tr.bv-tot td.bv-act .bv-up{color:#9FF0C9 !important;}
   table.bv .bv-of{font-size:9px; opacity:.7;}
+  table.bv .bv-ns{color:#8A8A90; font-weight:600; font-size:9px;}
+  table.bv tr.bv-tot .bv-ns{color:#D6D6DA;}
+  table.bv td.bv-branch.bv-ok{background:#1A7F55;} table.bv td.bv-branch.bv-mid{background:#B7791F;} table.bv td.bv-branch.bv-bad{background:#B42A24;}
+  table.bv .bv-bst{font-size:9.5px; font-weight:600; opacity:.95; margin-top:2px;}
+  table.bv-meta td{padding:4px 8px; font-size:11.5px;} table.bv-meta thead th{font-size:10px; max-width:none; padding:6px 6px;} table.bv-meta td.bv-ach{min-width:70px;}
   .bv-ov .bv-pot{background:#F7F1FB;}
   .oj-pers{display:flex; flex-direction:column; gap:5px; margin-top:8px;}
   .oj-per{display:grid; grid-template-columns:96px 1fr 52px; gap:8px; align-items:center;}
@@ -1258,6 +1263,7 @@
         <button class="tab-btn" data-view="eamercado">Sell Out Retail Vivo</button>
         <button class="tab-btn" data-view="relvivo">Relatório Vivo</button>
         <button class="tab-btn" data-view="branchview">Branch × Meta</button>
+        <button class="tab-btn" data-view="meta">META</button>
         <button class="tab-btn" data-view="abastecimento">Sugestão de Envio</button>
         <button class="tab-btn" data-view="clustererrado">Fora do Cluster</button>
         <button class="tab-btn" data-view="regional">Comparativo Regionais</button>
@@ -2135,6 +2141,15 @@
     <div id="bv-wrap"><table class="bv" id="bv-table"></table></div>
     <div class="bv-overall" id="bv-overall"></div>
     <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 ou sem venda (999).</div>
+  </div>
+
+  <div class="view" id="view-meta">
+    <div class="panel-head" style="margin-bottom:10px;">
+      <div class="panel-title">META · sell out vs target por branch e modelo</div>
+      <div class="panel-note" id="mt2-note"></div>
+    </div>
+    <div id="mt2-wrap" style="border:1px solid var(--line-2); border-radius:var(--radius-m); overflow:auto; background:#fff;"><table class="bv bv-meta" id="mt2-table"></table></div>
+    <div class="panel-note" style="margin-top:8px;">Os targets são os mesmos da aba <b>Branch × Meta</b> (pode editar aqui ou lá; os botões Metas do mês / Enviar meta ficam lá). A cor do nome do branch mostra a projeção do mês vs target: verde ≥ 100%, amarelo 85–99%, vermelho &lt; 85%. Target 0 aparece como "sem meta".</div>
   </div>
 
   <div class="view" id="view-metodo">
@@ -4163,7 +4178,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ['Ruptura', ['clmod','rupevol','ruptura']],
       ['Estoque', ['estoquemodelo','detalhelojas','estcore','estparado','clustererrado','abastecimento','cd','acessorios']],
       ['Planejamento', ['lanc','sop']],
-      ['Regionais', ['relvivo','regional','branchview']],
+      ['Regionais', ['relvivo','regional','branchview','meta']],
       ['Canais', ['revendas','eamercado','ecommerce']],
       ['Concorrência', ['oppojovi']],
       ['ⓘ Legenda', ['metodo']],
@@ -8459,6 +8474,29 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     });
     h += `</tbody>`;
     host.innerHTML = h;
+    // ---- aba META ----
+    const mh = document.getElementById('mt2-table');
+    if(mh){
+      const projOf = r=> dEl>0 ? r/dEl*dIn : r;
+      const pcol = pp=> pp===null ? '' : pp>=100 ? 'color:#1A9463;' : pp>=85 ? 'color:#B7791F;' : 'color:#D2322B;';
+      const mAch = (res,t)=> t>0 ? achCell(res,t) : `<td class="bv-ach"><span class="bv-ns">sem meta</span></td>`;
+      const mCells = (res,t,inp,tot)=>{ const proj=projOf(res), pp=t>0?proj/t*100:null, falta=Math.max(0,t-res), perDay=dLeft>0?falta/dLeft:null;
+        return `<td>${inp}</td><td><b>${fmtInt(res)}</b></td>${mAch(res,t)}<td>${fmtInt(Math.round(proj))}</td><td style="font-weight:700; ${tot&&pp!==null?(pp>=100?'color:#9FF0C9;':pp>=85?'color:#FFE08A;':'color:#FFC2BD;'):pcol(pp)}">${pp===null?'<span class="bv-ns">sem meta</span>':Math.round(pp)+'%'}</td>
+          <td>${t>0?(falta>0?fmtInt(falta):'<span class="bv-up">✓ batida</span>'):'—'}</td><td>${t>0&&falta>0&&perDay!==null?(Math.round(perDay*10)/10).toString().replace('.',','):'—'}</td>`; };
+      let mt = `<thead><tr class="bv-h2"><th>BRANCH</th><th>MODELO</th><th>TARGET</th><th>RESULT</th><th>ACHIEVE</th><th>PROJEÇÃO DO MÊS</th><th>% PROJ. vs TARGET</th><th>FALTA P/ META</th><th>POR DIA (${dLeft} dias restantes)</th></tr></thead><tbody>`;
+      [...BV_BRANCHES,'TOTAL'].forEach(b=>{ const isT=b==='TOTAL';
+        const tTb = BV_MODELS.reduce((a,[,m])=>a+tgt(b,m),0), rTb = sumM(b,c=>c.res);
+        const ppB = tTb>0 ? projOf(rTb)/tTb*100 : null;
+        const bCls = ppB===null ? '' : ppB>=100 ? ' bv-ok' : ppB>=85 ? ' bv-mid' : ' bv-bad';
+        BV_MODELS.forEach(([,m],i)=>{ const t=tgt(b,m), c=A[b][m];
+          mt += `<tr class="${i===0?'bv-first':''}">${i===0?`<td rowspan="${BV_MODELS.length+1}" class="bv-branch${bCls}" title="Projeção ${fmtInt(Math.round(projOf(rTb)))} un. vs target ${fmtInt(tTb)}">${b}<div class="bv-bst">${ppB===null?'sem meta':'proj. '+Math.round(ppB)+'%'}</div></td>`:''}<td class="bv-model">${m}</td>${mCells(c.res,t, isT?fmtInt(t):`<input class="bv-in" type="number" min="0" step="1" data-b="${b}" data-m="${m}" value="${t}" aria-label="Target ${b} ${m}">`)}</tr>`; });
+        mt += `<tr class="bv-tot"><td class="bv-model">TOTAL</td>${mCells(rTb,tTb,fmtInt(tTb),true)}</tr>`; });
+      mh.innerHTML = mt + '</tbody>';
+      const mn = document.getElementById('mt2-note'); if(mn) mn.innerHTML = `Meta de ${DATA.meta.month_label}, sell-out das 70 lojas do cadastro (só aparelhos) até ${fmtDate(REFISO)} · ${dEl} de ${dIn} dias. Projeção = ritmo diário do mês × dias do mês.`;
+      mh.querySelectorAll('input.bv-in').forEach(inp=>inp.addEventListener('change', ()=>{
+        const v = Math.max(0, parseFloat(inp.value)||0); (bvTargets[inp.dataset.b]||(bvTargets[inp.dataset.b]={}))[inp.dataset.m]=v; bvSaveTargets();
+        const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }));
+    }
     // resumo por grupo de promotor + potencial
     const nG = g=>A.TOTAL._stores[g]||0;
     const prodOf = g=> nG(g)>0 ? overall[g].so/nG(g) : 0;
