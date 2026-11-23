@@ -684,13 +684,6 @@
   table.bv tr.bv-tot td.bv-act b{background:transparent;}
   table.bv tr.bv-tot td.bv-act .bv-up{color:#9FF0C9 !important;}
   table.bv .bv-of{font-size:9px; opacity:.7;}
-  table.bv .bv-ns{color:#8A8A90; font-weight:600; font-size:9px;}
-  table.bv tr.bv-tot .bv-ns{color:#D6D6DA;}
-  table.bv td.bv-branch.bv-ok{background:#1A7F55;} table.bv td.bv-branch.bv-mid{background:#B7791F;} table.bv td.bv-branch.bv-bad{background:#B42A24;}
-  table.bv .bv-bst{font-size:9.5px; font-weight:600; opacity:.95; margin-top:2px;}
-  table.bv .bv-pc{font-size:9.5px; font-weight:600; color:#6B6B70; margin-left:2px;}
-  table.bv tr.bv-tot .bv-pc{color:#E6E6EA;}
-  table.bv-prom td{padding:3px 6px; font-size:11px;} table.bv-meta td{padding:4px 8px; font-size:11.5px;} table.bv-meta thead th{font-size:10px; max-width:none; padding:6px 6px;} table.bv-meta td.bv-ach{min-width:70px;} table.bv-prom td.bv-gs{border-left:2px solid #3A0059;}
   .bv-ov .bv-pot{background:#F7F1FB;}
   .oj-pers{display:flex; flex-direction:column; gap:5px; margin-top:8px;}
   .oj-per{display:grid; grid-template-columns:96px 1fr 52px; gap:8px; align-items:center;}
@@ -1264,8 +1257,7 @@
         <button class="tab-btn" data-view="oppojovi">JOVI × Concorrentes</button>
         <button class="tab-btn" data-view="eamercado">Sell Out Retail Vivo</button>
         <button class="tab-btn" data-view="relvivo">Relatório Vivo</button>
-        <button class="tab-btn" data-view="branchview">Branch</button>
-        <button class="tab-btn" data-view="meta">META</button>
+        <button class="tab-btn" data-view="branchview">Branch × Meta</button>
         <button class="tab-btn" data-view="abastecimento">Sugestão de Envio</button>
         <button class="tab-btn" data-view="clustererrado">Fora do Cluster</button>
         <button class="tab-btn" data-view="regional">Comparativo Regionais</button>
@@ -2114,12 +2106,18 @@
   <div class="view" id="view-branchview">
     <div class="panel-head" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap;">
       <div>
-        <div class="panel-title">Visão por branch · estoque, sell out e promotores</div>
+        <div class="panel-title">Visão por branch · estoque, sell out vs target e promotores</div>
         <div class="panel-note" id="bv-note"></div>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
         <button class="btn-toggle" id="bv-sum-toggle" type="button" aria-pressed="false" title="Mostra ou esconde o resumo em texto, com seletor de semana">Resumo</button>
         <button class="btn-toggle" id="bv-fit" type="button" aria-pressed="true">Ajustar à largura da tela</button>
+        <button class="mt-open" id="bv-metas" type="button">🎯 Metas do mês</button>
+        <button class="btn-toggle" id="bv-reset" type="button" title="Volta os targets do mês atual para a meta de referência (setembro/26) ou zero">Restaurar targets</button>
+        <button class="btn-toggle" id="bv-copy" type="button" title="Copia os targets atuais (os que você editou nesta tabela) pra você me mandar de volta">Copiar targets</button>
+        <button class="btn-toggle" id="bv-template" type="button" title="Baixa um Excel com a tabela de branch × modelo, já preenchido com os targets atuais do mês, pra editar e subir de volta">Baixar modelo</button>
+        <button class="btn-toggle" id="bv-upload" type="button" title="Sobe um Excel (mesmo formato do modelo) com a meta do mês vigente, por branch e modelo">Enviar meta (Excel)</button>
+        <input type="file" id="bv-upload-input" accept=".xlsx,.xls" style="display:none;">
       </div>
     </div>
     <div class="panel" id="bv-sum-panel" style="margin-bottom:12px; display:none;">
@@ -2135,29 +2133,8 @@
       <div id="bv-summary" class="bv-summary"></div>
     </div>
     <div id="bv-wrap"><table class="bv" id="bv-table"></table></div>
-    <div class="panel-title" style="margin:14px 0 6px;">Por tipo de promotor · total de cada branch</div>
-    <div id="bv-wrap2" style="border:1px solid var(--line-2); border-radius:var(--radius-m); overflow:auto; background:#fff;"><table class="bv bv-prom" id="bv-prom"></table></div>
     <div class="bv-overall" id="bv-overall"></div>
-    <div class="panel-note" style="margin-top:8px;">DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 ou sem venda nas últimas 4 semanas (s/ venda). O detalhe por tipo de promotor fica na tabela logo abaixo.</div>
-  </div>
-
-  <div class="view" id="view-meta">
-    <div class="panel-head" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap;">
-      <div>
-        <div class="panel-title">META · sell out vs target por branch e modelo</div>
-        <div class="panel-note" id="mt2-note"></div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-        <button class="mt-open" id="bv-metas" type="button">🎯 Metas do mês</button>
-        <button class="btn-toggle" id="bv-reset" type="button" title="Volta os targets do mês atual para a meta de referência (setembro/26) ou zero">Restaurar targets</button>
-        <button class="btn-toggle" id="bv-copy" type="button" title="Copia os targets atuais (os que você editou nesta tabela) pra você me mandar de volta">Copiar targets</button>
-        <button class="btn-toggle" id="bv-template" type="button" title="Baixa um Excel com a tabela de branch × modelo, já preenchido com os targets atuais do mês, pra editar e subir de volta">Baixar modelo</button>
-        <button class="btn-toggle" id="bv-upload" type="button" title="Sobe um Excel (mesmo formato do modelo) com a meta do mês vigente, por branch e modelo">Enviar meta (Excel)</button>
-        <input type="file" id="bv-upload-input" accept=".xlsx,.xls" style="display:none;">
-      </div>
-    </div>
-    <div id="mt2-wrap" style="border:1px solid var(--line-2); border-radius:var(--radius-m); overflow:auto; background:#fff;"><table class="bv bv-meta" id="mt2-table"></table></div>
-    <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). A cor do nome do branch mostra a projeção do mês vs target: verde ≥ 100%, amarelo 85–99%, vermelho &lt; 85%. Target 0 aparece como "sem meta".</div>
+    <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 ou sem venda (999).</div>
   </div>
 
   <div class="view" id="view-metodo">
@@ -4186,7 +4163,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ['Ruptura', ['clmod','rupevol','ruptura']],
       ['Estoque', ['estoquemodelo','detalhelojas','estcore','estparado','clustererrado','abastecimento','cd','acessorios']],
       ['Planejamento', ['lanc','sop']],
-      ['Regionais', ['relvivo','regional','branchview','meta']],
+      ['Regionais', ['relvivo','regional','branchview']],
       ['Canais', ['revendas','eamercado','ecommerce']],
       ['Concorrência', ['oppojovi']],
       ['ⓘ Legenda', ['metodo']],
@@ -8360,8 +8337,8 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   function bvDot(dos, stock){
     let c, v;
     if(!stock){ c='#1F1F1F'; v='0'; }
-    else if(dos===null){ c='#D2322B'; v='<span class="bv-ns">s/ venda</span>'; }
-    else { v = dos>=999 ? '999+' : fmtInt(dos); c = dos<60 ? '#3E9C79' : dos<=90 ? '#E3B55A' : '#D2322B'; }
+    else if(dos===null){ c='#D2322B'; v='999'; }
+    else { v = fmtInt(Math.min(dos,999)); c = dos<60 ? '#3E9C79' : dos<=90 ? '#E3B55A' : '#D2322B'; }
     return `<span class="bv-dot" style="background:${c};"></span>${v}`;
   }
   function renderBranchView(){
@@ -8372,7 +8349,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const monthStart = `${ry}-${String(rm).padStart(2,'0')}-01`;
     // semanas: as 5 últimas semanas ISO até a data da última venda
     const weeks = []; { let d = new Date(REFISO+'T00:00:00Z'); const dow=(d.getUTCDay()+6)%7; let mon = new Date(d.getTime()-dow*86400000);
-      for(let i=0;i<5;i++){ const st=new Date(mon.getTime()-i*7*86400000), en=new Date(st.getTime()+6*86400000); weeks.unshift({start:st.toISOString().slice(0,10), end:en.toISOString().slice(0,10), label:'W'+bvIsoWeek(st.toISOString().slice(0,10))}); } }
+      for(let i=0;i<5;i++){ const st=new Date(mon.getTime()-i*7*86400000), en=new Date(st.getTime()+6*86400000); weeks.unshift({start:st.toISOString().slice(0,10), end:en.toISOString().slice(0,10), label:'S'+bvIsoWeek(st.toISOString().slice(0,10))}); } }
     const w4Start = weeks[1].start, w4End = weeks[4].end;
     const w4Days = Math.round((Math.min(new Date(w4End+'T00:00:00Z'), new Date(REFISO+'T00:00:00Z')) - new Date(w4Start+'T00:00:00Z'))/86400000)+1;
     const storeBy = {}; DATA.stores.forEach(s=>storeBy[s.code]=s);
@@ -8433,12 +8410,14 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const dosOf = (stock, so)=> so>0 ? stock/(so/w4Days) : null;
     const pc = (a,b)=> b>0 ? Math.round(a/b*100)+'%' : '0%';
     const arrow = d=> d>0.5 ? '<span class="bv-up">▲</span>' : d<-0.5 ? '<span class="bv-dn">▼</span>' : '<span class="bv-eq">▬</span>';
-    const achCell = (res,t)=>{ if(!(t>0)) return `<td class="bv-ach"><span class="bv-ns">sem meta</span></td>`; const p = res/t*100; return `<td class="bv-ach"><span class="bv-achbar" style="width:${Math.min(100,p).toFixed(0)}%;"></span><b>${t>0?Math.round(p)+'%':'0%'}</b></td>`; };
+    const achCell = (res,t)=>{ const p = t>0 ? res/t*100 : 0; return `<td class="bv-ach"><span class="bv-achbar" style="width:${Math.min(100,p).toFixed(0)}%;"></span><b>${t>0?Math.round(p)+'%':'0%'}</b></td>`; };
 
     let h = `<thead>
-      <tr class="bv-h1"><th rowspan="2">BRANCH</th><th rowspan="2">MODELO</th><th colspan="5">ESTOQUE</th><th colspan="8">SELL OUT</th><th colspan="3">ANÁLISE</th></tr>
+      <tr class="bv-h1"><th rowspan="2">BRANCH</th><th rowspan="2">MODELO</th><th colspan="5">ESTOQUE</th><th colspan="10">SELL OUT vs TARGET</th>
+        <th rowspan="2" style="white-space:normal; max-width:44px;">TOTAL LOJAS</th>${GR.map(([,l])=>`<th colspan="6">${l}</th>`).join('')}<th colspan="3">ANÁLISE</th></tr>
       <tr class="bv-h2"><th>LOJA</th><th>TRÂNSITO</th><th>TOTAL</th><th class="bv-wh">CD</th><th>DoS</th>
-        <th>RESULT (mês)</th>${weeks.map(w=>`<th title="${fmtDate(w.start)} a ${fmtDate(w.end>REFISO?REFISO:w.end)}${w.end>REFISO?' (semana em andamento)':''}">${w.label}${w.end>REFISO?'*':''}<div style="font-weight:500; font-size:8.5px; opacity:.85;">${w.start.slice(8,10)}/${w.start.slice(5,7)}</div></th>`).join('')}<th class="bv-wh">TOTAL (4S)</th><th>DoS (4S)</th>
+        <th>TARGET</th><th>RESULT</th><th>ACHIEVE</th>${weeks.map(w=>`<th title="${fmtDate(w.start)} a ${fmtDate(w.end>REFISO?REFISO:w.end)}${w.end>REFISO?' (semana em andamento)':''}">${w.label}${w.end>REFISO?'*':''}<div style="font-weight:500; font-size:8.5px; opacity:.85;">${w.start.slice(8,10)}/${w.start.slice(5,7)}</div></th>`).join('')}<th class="bv-wh">TOTAL (4S)</th><th>DoS (4S)</th>
+        ${GR.map(()=>`<th>LOJAS</th><th>PROD.</th><th>ESTOQUE</th><th>%</th><th>SELL OUT 4S</th><th>DoS</th>`).join('')}
         <th>% ESTQ</th><th>% SO</th><th>DELTA</th></tr></thead><tbody>`;
     const overall = {FT:{st:0,so:0},PT:{st:0,so:0},NO:{st:0,so:0}};
     [...BV_BRANCHES,'TOTAL'].forEach(b=>{
@@ -8454,8 +8433,13 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         h += `<tr class="${i===0?'bv-first':''}">
           ${i===0?`<td rowspan="${BV_MODELS.length+1}" class="bv-branch">${b}</td>`:''}
           <td class="bv-model">${m}</td><td>${fmtInt(c.store)}</td><td>${fmtInt(c.tr)}</td><td><b>${fmtInt(tot)}</b></td><td class="bv-wh">${fmtInt(c.wh)}</td><td class="bv-l">${bvDot(dInv, tot+c.wh)}</td>
-          <td>${fmtInt(c.res)}</td>
+          <td>${isT?fmtInt(t):`<input class="bv-in" type="number" min="0" step="1" data-b="${b}" data-m="${m}" value="${t}" aria-label="Target ${b} ${m}">`}</td><td>${fmtInt(c.res)}</td>${achCell(c.res,t)}
           ${c.wk.map((v,i)=>`<td>${fmtInt(v)}${i===4?trend(c.wk):''}</td>`).join('')}<td class="bv-wh">${fmtInt(c.w4)}</td><td class="bv-l">${bvDot(d4, tot)}</td>
+          ${i===0?`<td rowspan="${BV_MODELS.length}" class="bv-big">${fmtInt(st.all)}</td>`:''}
+          ${GR.map(([g])=>{ const x=c.g[g]; const dd=dosOf(x.st,x.so);
+            const cells = `<td>${fmtInt(x.st)}</td><td>${pc(x.st,bTot)}</td><td>${fmtInt(x.so)}</td><td class="bv-l">${bvDot(dd,x.st)}</td>`;
+            const lead = i===0 ? `<td rowspan="${BV_MODELS.length}" class="bv-big">${fmtInt(st[g])}</td><td rowspan="${BV_MODELS.length}" class="bv-big">${(()=>{ const so=sumM(b,cc=>cc.g[g].so); return st[g]?(Math.round(so/st[g]*100)/100).toString().replace('.',','):'0'; })()}</td>` : '';
+            return lead+cells; }).join('')}
           <td>${Math.round(pInv)}%</td><td>${Math.round(pSo)}%</td><td class="bv-l">${arrow(pSo-pInv)} ${Math.abs(Math.round(pSo-pInv))}%</td>
         </tr>`;
       });
@@ -8465,47 +8449,16 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       const pInvB = isT?100:(nat.tot>0?bTot/nat.tot*100:0), pSoB = isT?100:(nat.w4>0?bW4/nat.w4*100:0);
       h += `<tr class="bv-tot">
         <td class="bv-model">TOTAL</td><td>${fmtInt(sumM(b,c=>c.store))}</td><td>${fmtInt(sumM(b,c=>c.tr))}</td><td>${fmtInt(bTot)}</td><td>${fmtInt(whT)}</td><td class="bv-l">${bvDot(dosOf(bTot+whT,bW4), bTot+whT)}</td>
-        <td>${fmtInt(rT)}</td>${wkT.map((v,i)=>`<td>${fmtInt(v)}${i===4?trend(wkT):''}</td>`).join('')}<td>${fmtInt(bW4)}</td><td class="bv-l">${bvDot(dosOf(bTot,bW4), bTot)}</td>
+        <td>${fmtInt(tT)}</td><td>${fmtInt(rT)}</td>${achCell(rT,tT)}${wkT.map((v,i)=>`<td>${fmtInt(v)}${i===4?trend(wkT):''}</td>`).join('')}<td>${fmtInt(bW4)}</td><td class="bv-l">${bvDot(dosOf(bTot,bW4), bTot)}</td>
+        <td>${isT?'100%':pc(st.all, A.TOTAL._stores.all)}</td>
+        ${GR.map(([g])=>{ const stG=sumM(b,c=>c.g[g].st), soG=sumM(b,c=>c.g[g].so); if(!isT){ overall[g].st+=stG; overall[g].so+=soG; }
+          const d = (bW4>0?soG/bW4*100:0) - (bTot>0?stG/bTot*100:0);
+          return `<td>${pc(st[g],st.all)}</td><td></td><td>${fmtInt(stG)}<div class="bv-sub">${pc(stG,bTot)}</div></td><td></td><td>${fmtInt(soG)}<div class="bv-sub">${pc(soG,bW4)}</div></td><td class="bv-l">${bvDot(dosOf(stG,soG),stG)}<div class="bv-sub">${arrow(d)} ${Math.abs(Math.round(d))}%</div></td>`; }).join('')}
         <td>${Math.round(pInvB)}%</td><td>${Math.round(pSoB)}%</td><td class="bv-l">${arrow(pSoB-pInvB)} ${Math.abs(Math.round(pSoB-pInvB))}%</td>
       </tr>`;
     });
     h += `</tbody>`;
     host.innerHTML = h;
-    // ---- aba META ----
-    const mh = document.getElementById('mt2-table');
-    if(mh){
-      const projOf = r=> dEl>0 ? r/dEl*dIn : r;
-      const pcol = pp=> pp===null ? '' : pp>=100 ? 'color:#1A9463;' : pp>=85 ? 'color:#B7791F;' : 'color:#D2322B;';
-      const mCells = (res,t,inp,tot)=>{ const proj=projOf(res), pp=t>0?proj/t*100:null, falta=Math.max(0,t-res), perDay=dLeft>0?falta/dLeft:null;
-        return `<td>${inp}</td><td><b>${fmtInt(res)}</b></td>${achCell(res,t)}<td>${fmtInt(Math.round(proj))}</td><td style="font-weight:700; ${tot&&pp!==null?(pp>=100?'color:#9FF0C9;':pp>=85?'color:#FFE08A;':'color:#FFC2BD;'):pcol(pp)}">${pp===null?'<span class="bv-ns">sem meta</span>':Math.round(pp)+'%'}</td>
-          <td>${t>0?(falta>0?fmtInt(falta):'<span class="bv-up">✓ batida</span>'):'—'}</td><td>${t>0&&falta>0&&perDay!==null?(Math.round(perDay*10)/10).toString().replace('.',','):'—'}</td>`; };
-      let mt = `<thead><tr class="bv-h2"><th>BRANCH</th><th>MODELO</th><th>TARGET</th><th>RESULT</th><th>ACHIEVE</th><th>PROJEÇÃO DO MÊS</th><th>% PROJ. vs TARGET</th><th>FALTA P/ META</th><th>POR DIA (${dLeft} dias restantes)</th></tr></thead><tbody>`;
-      [...BV_BRANCHES,'TOTAL'].forEach(b=>{ const isT=b==='TOTAL';
-        const tTb = BV_MODELS.reduce((a,[,m])=>a+tgt(b,m),0), rTb = sumM(b,c=>c.res);
-        const ppB = tTb>0 ? projOf(rTb)/tTb*100 : null;
-        const bCls = ppB===null ? '' : ppB>=100 ? ' bv-ok' : ppB>=85 ? ' bv-mid' : ' bv-bad';
-        BV_MODELS.forEach(([,m],i)=>{ const t=tgt(b,m), c=A[b][m];
-          mt += `<tr class="${i===0?'bv-first':''}">${i===0?`<td rowspan="${BV_MODELS.length+1}" class="bv-branch${bCls}" title="Projeção ${fmtInt(Math.round(projOf(rTb)))} un. vs target ${fmtInt(tTb)}">${b}<div class="bv-bst">${ppB===null?'sem meta':'proj. '+Math.round(ppB)+'%'}</div></td>`:''}<td class="bv-model">${m}</td>${mCells(c.res,t, isT?fmtInt(t):`<input class="bv-in" type="number" min="0" step="1" data-b="${b}" data-m="${m}" value="${t}" aria-label="Target ${b} ${m}">`)}</tr>`; });
-        mt += `<tr class="bv-tot"><td class="bv-model">TOTAL</td>${mCells(rTb,tTb,fmtInt(tTb),true)}</tr>`; });
-      mh.innerHTML = mt + '</tbody>';
-      const mn = document.getElementById('mt2-note'); if(mn) mn.innerHTML = `Meta de ${DATA.meta.month_label}, sell-out das 70 lojas do cadastro (só aparelhos) até ${fmtDate(REFISO)} · ${dEl} de ${dIn} dias. Projeção = ritmo diário do mês × dias do mês.`;
-      mh.querySelectorAll('input.bv-in').forEach(inp=>inp.addEventListener('change', ()=>{
-        const v = Math.max(0, parseFloat(inp.value)||0); (bvTargets[inp.dataset.b]||(bvTargets[inp.dataset.b]={}))[inp.dataset.m]=v; bvSaveTargets();
-        const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }));
-    }
-    // ---- promotor por branch (só totais), número e % lado a lado ----
-    const pct = (a,b)=>`<span class="bv-pc">${b>0?Math.round(a/b*100):0}%</span>`;
-    let hp = `<thead><tr class="bv-h1"><th rowspan="2">BRANCH</th><th rowspan="2">LOJAS</th>${GR.map(([,l])=>`<th colspan="5">${l}</th>`).join('')}</tr>
-      <tr class="bv-h2">${GR.map(()=>`<th>LOJAS</th><th>PROD. (un./loja 4S)</th><th>ESTOQUE</th><th>SELL OUT 4S</th><th>DoS</th>`).join('')}</tr></thead><tbody>`;
-    [...BV_BRANCHES,'TOTAL'].forEach(b=>{ const st=A[b]._stores, isT=b==='TOTAL';
-      const bTot=sumM(b,c=>c.store+c.tr), bW4=sumM(b,c=>c.w4);
-      if(!isT) GR.forEach(([g])=>{ overall[g].st+=sumM(b,c=>c.g[g].st); overall[g].so+=sumM(b,c=>c.g[g].so); });
-      hp += `<tr class="${isT?'bv-tot':''}"><td class="bv-model" style="font-weight:800;">${b}</td><td><b>${fmtInt(st.all)}</b></td>${GR.map(([g])=>{
-        const stG=sumM(b,c=>c.g[g].st), soG=sumM(b,c=>c.g[g].so);
-        const d=(bW4>0?soG/bW4*100:0)-(bTot>0?stG/bTot*100:0);
-        const prod = st[g] ? (Math.round(soG/st[g]*100)/100).toString().replace('.',',') : '—';
-        return `<td class="bv-gs">${fmtInt(st[g])} ${pct(st[g],st.all)}</td><td>${prod}</td><td>${fmtInt(stG)} ${pct(stG,bTot)}</td><td title="Participação no sell out vs participação no estoque: ${d>0?'+':''}${Math.round(d)} p.p.">${fmtInt(soG)} ${pct(soG,bW4)} ${arrow(d)}</td><td class="bv-l">${bvDot(dosOf(stG,soG),stG)}</td>`; }).join('')}</tr>`; });
-    const ph = document.getElementById('bv-prom'); if(ph) ph.innerHTML = hp + '</tbody>';
     // resumo por grupo de promotor + potencial
     const nG = g=>A.TOTAL._stores[g]||0;
     const prodOf = g=> nG(g)>0 ? overall[g].so/nG(g) : 0;
