@@ -321,6 +321,7 @@
   }
   @page{size:A4 landscape; margin:9mm;}
   .rv-print-only{display:none;}
+  .xlreg-btn{font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; font-weight:800; padding:8px 16px; border:none; border-radius:999px; background:#1F6E4A; color:#fff; cursor:pointer; text-transform:none; letter-spacing:0; box-shadow:0 1px 3px rgba(0,0,0,.15);} .xlreg-btn:hover{background:#17573A;} .xlreg-btn:disabled{opacity:.7; cursor:wait;}
   table.rvd-tb{width:100%; border-collapse:collapse; font-size:11px; font-variant-numeric:tabular-nums; table-layout:auto;}
   table.rvd-tb th{background:#3A0059; color:#fff; font-size:10px; font-weight:700; padding:4px 2px; text-align:center; position:static; text-transform:none; letter-spacing:0;}
   table.rvd-tb th.rvd-h{min-width:24px;} table.rvd-tb th.rvd-h span{display:block; font-size:8.5px; font-weight:600; opacity:.75;} table.rvd-tb th.rvd-h.we{background:#5B5566;}
@@ -1694,6 +1695,7 @@
             <input type="number" id="em-dias" min="0" step="1" style="width:60px; font-family:'IBM Plex Sans',sans-serif; font-size:12px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:var(--surface-50); color:var(--ink-900);">
           </label>
           <button class="btn-toggle" id="em-export" type="button" title="Baixa em Excel a tabela como está na tela (modelo, regional e meta de cobertura selecionados)">Exportar Excel</button>
+          <button type="button" class="xlreg-btn" title="Excel formatado: resumo por regional, uma aba por regional (loja a loja, por modelo) e uma aba do CD">⬇ Excel por regional</button>
               <select id="em-modelo" style="font-family:'IBM Plex Sans',sans-serif; font-size:12px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:var(--surface-50); color:var(--ink-900);"></select>
         </div>
       </div>
@@ -1815,7 +1817,7 @@
 
   <!-- ============ CD / CDL ============ -->
   <div class="view" id="view-cd">
-    <div class="cdx-mode"><span>Ver:</span><div class="cdx-seg" id="cdx-seg"><button type="button" data-m="all">Tudo</button><button type="button" data-m="dev">Aparelhos</button><button type="button" data-m="acc">Acessórios</button></div></div>
+    <div class="cdx-mode"><button type="button" class="xlreg-btn" title="Excel formatado: resumo por regional, uma aba por regional (loja a loja, por modelo) e uma aba do CD">⬇ Excel por regional</button><span style="margin-left:6px;">Ver:</span><div class="cdx-seg" id="cdx-seg"><button type="button" data-m="all">Tudo</button><button type="button" data-m="dev">Aparelhos</button><button type="button" data-m="acc">Acessórios</button></div></div>
     <div class="cdx-kpis" id="cd-kpi-strip"></div>
     <div class="cdx-grid">
       <div class="panel">
@@ -2751,6 +2753,7 @@
           <option value="12">Sell out 12 semanas</option>
         </select>
         <button type="button" id="dl-copy">Copiar</button>
+        <button type="button" class="xlreg-btn" title="Excel formatado: resumo por regional, uma aba por regional (loja a loja, por modelo) e uma aba do CD">⬇ Excel por regional</button>
       </div>
       <div class="table-scroll" style="max-height:640px;">
         <table id="dl-table">
@@ -4823,7 +4826,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
 "Venda no mês (até ontem)":"Month sales (through yesterday)","un.":"units","Projeção de vendas (mês)":"Sales projection (month)","Estoque em loja":"Store stock","Estoque no CD":"DC stock","Estoque total":"Total stock","loja + trânsito + CD":"store + transit + DC",
 "DoS loja":"Store DoS","dias":"days","estoque em loja ÷ venda média/dia":"store stock ÷ avg daily sales","DoS total":"Total DoS","Ruptura":"Stock-out","Produtividade":"Productivity","un./loja":"units/store","Lojas ativas no mês":"Active stores this month","Lojas zeradas":"Zero-stock stores",
 "modelos ainda repostos (exclui phase out) sem estoque em loja — não considera CD":"replenished models (excl. phase out) with no store stock — DC not counted","Em trânsito (zeradas)":"In transit (zero-stock)","transferência somada dessas lojas zeradas":"transfers to these zero-stock stores",
-"Visão Geral":"Overview","🖨 Imprimir / salvar PDF":"🖨 Print / save PDF","Imprimir / salvar PDF":"Print / save PDF","⬇ Baixar PDF":"⬇ Download PDF","Baixar PDF":"Download PDF","⬇ PDF resumido em inglês (regionais + lojas)":"⬇ Short PDF in English (branches + stores)","PDF resumido em inglês (regionais + lojas)":"Short PDF in English (branches + stores)","Resumo Mensal":"Monthly Summary","Parado nas Lojas":"Idle in Stores","Estoque parado nas lojas":"Idle stock in stores","Sugestão de abastecimento · Lojas Vivo":"Replenishment suggestion · Vivo stores","Entrega + CD × necessidade das lojas":"Delivery + DC × store needs","Sugestão por loja":"Suggestion by store","Voltar ao padrão":"Reset to default","⬇ Baixar Excel completo":"⬇ Download full Excel","Cluster por modelo e regional":"Cluster by model and regional","Lojas sem estoque · modelo × regional":"Stores out of stock · model × regional","Lojas zeradas por modelo · sugestão de envio":"Out-of-stock stores by model · shipment suggestion","Evolução da ruptura":"Stockout trend","Semana a semana · por modelo":"Week by week · by model","Semana a semana · por regional":"Week by week · by regional","Chegada nas lojas":"Arrival in stores","Promotores Jovi — efeito na venda":"Jovi promoters — effect on sales","Produtividade por tipo de promotor":"Productivity by promoter type","Promotor Jovi × promotor OPPO":"Jovi promoter × OPPO promoter","Ranking das lojas":"Store ranking","Promotores em atenção":"Promoters needing attention","Lojas sem promotor que mais vendem":"Top-selling stores without promoter","S&OP · Demanda × Estoque":"S&OP · Demand × Inventory","Plano mensal por modelo":"Monthly plan by model","Detalhe semanal":"Weekly detail","Jovi × Vivo — reunião semanal":"Jovi × Vivo — weekly meeting","Perda por ruptura":"Stockout loss","Perda por loja":"Loss by store","Por dia":"By day","Exportar Excel (CSV)":"Export Excel (CSV)","Lojas com promotor":"Stores with promoter","Lojas do cluster":"Cluster stores","Aguardando envio":"Awaiting shipment","A caminho":"In transit","Na loja · sem venda":"In store · no sales","Já vendeu":"Already sold","Lojas com o modelo":"Stores with the model","Unidades no canal":"Units in channel","Vendidas":"Sold","Peças paradas 60+ dias":"Units idle 60+ days","Peças paradas 30–60 dias":"Units idle 30–60 days","Total parado":"Total idle","Lojas com estoque parado":"Stores with idle stock","Com destino sugerido":"With suggested destination","Lojas a abastecer":"Stores to replenish","Total sugerido":"Total suggested","Falta no CD":"DC shortfall","Venda da semana":"Week sales","Estoque parado nas lojas ":"Idle stock in stores","Destaques de hoje":"Today's highlights","Sell-out Diário":"Daily Sell-out","Por Loja":"By Store","Resumo do Mês":"Month Summary","Mês × Mês":"Month × Month","Por Modelo":"By Model","Produtividade (un./loja)":"Productivity (units/store)","Lojas por Mês":"Stores by Month","Lojas por Semana":"Stores by Week","Venda Perdida":"Lost Sales","Zeradas Hoje":"Out of Stock Today","Branch × Meta":"Branch × Target","Sugestão de Envio":"Shipment Suggestion","Comparativo Regionais":"Regional Comparison","Revendas (EA) · Sell-through":"Resellers (EA) · Sell-through","Reunião Vivo":"Vivo Meeting","Vendas":"Sales","Ruptura":"Stockout","Estoque":"Inventory","Planejamento":"Planning","Relatório Vivo":"Vivo Report","Promotores":"Promoters","Lançamento":"Launch","Acompanhamento de lançamento":"Launch tracking","Evolução Semanal":"Weekly Trend","Exportar cluster de cada modelo":"Export each model's cluster","Lojas Zeradas por Modelo":"Out-of-Stock Stores by Model","Regionais":"Regionals","Canais":"Channels","Concorrência":"Competition","Detalhe Lojas":"Store Detail","Visão Mensal":"Monthly View","Comparativo de Meses":"Month Comparison","Análise de Modelo":"Model Analysis","Estoque por Modelo":"Stock by Model","Jovi Mensal":"Jovi Monthly","Jovi Semanal":"Jovi Weekly","Lojas em Alta":"Top Stores","Acessórios":"Accessories",
+"Visão Geral":"Overview","🖨 Imprimir / salvar PDF":"🖨 Print / save PDF","Imprimir / salvar PDF":"Print / save PDF","⬇ Baixar PDF":"⬇ Download PDF","Baixar PDF":"Download PDF","⬇ Excel por regional":"⬇ Excel by branch","⬇ PDF resumido em inglês (regionais + lojas)":"⬇ Short PDF in English (branches + stores)","PDF resumido em inglês (regionais + lojas)":"Short PDF in English (branches + stores)","Resumo Mensal":"Monthly Summary","Parado nas Lojas":"Idle in Stores","Estoque parado nas lojas":"Idle stock in stores","Sugestão de abastecimento · Lojas Vivo":"Replenishment suggestion · Vivo stores","Entrega + CD × necessidade das lojas":"Delivery + DC × store needs","Sugestão por loja":"Suggestion by store","Voltar ao padrão":"Reset to default","⬇ Baixar Excel completo":"⬇ Download full Excel","Cluster por modelo e regional":"Cluster by model and regional","Lojas sem estoque · modelo × regional":"Stores out of stock · model × regional","Lojas zeradas por modelo · sugestão de envio":"Out-of-stock stores by model · shipment suggestion","Evolução da ruptura":"Stockout trend","Semana a semana · por modelo":"Week by week · by model","Semana a semana · por regional":"Week by week · by regional","Chegada nas lojas":"Arrival in stores","Promotores Jovi — efeito na venda":"Jovi promoters — effect on sales","Produtividade por tipo de promotor":"Productivity by promoter type","Promotor Jovi × promotor OPPO":"Jovi promoter × OPPO promoter","Ranking das lojas":"Store ranking","Promotores em atenção":"Promoters needing attention","Lojas sem promotor que mais vendem":"Top-selling stores without promoter","S&OP · Demanda × Estoque":"S&OP · Demand × Inventory","Plano mensal por modelo":"Monthly plan by model","Detalhe semanal":"Weekly detail","Jovi × Vivo — reunião semanal":"Jovi × Vivo — weekly meeting","Perda por ruptura":"Stockout loss","Perda por loja":"Loss by store","Por dia":"By day","Exportar Excel (CSV)":"Export Excel (CSV)","Lojas com promotor":"Stores with promoter","Lojas do cluster":"Cluster stores","Aguardando envio":"Awaiting shipment","A caminho":"In transit","Na loja · sem venda":"In store · no sales","Já vendeu":"Already sold","Lojas com o modelo":"Stores with the model","Unidades no canal":"Units in channel","Vendidas":"Sold","Peças paradas 60+ dias":"Units idle 60+ days","Peças paradas 30–60 dias":"Units idle 30–60 days","Total parado":"Total idle","Lojas com estoque parado":"Stores with idle stock","Com destino sugerido":"With suggested destination","Lojas a abastecer":"Stores to replenish","Total sugerido":"Total suggested","Falta no CD":"DC shortfall","Venda da semana":"Week sales","Estoque parado nas lojas ":"Idle stock in stores","Destaques de hoje":"Today's highlights","Sell-out Diário":"Daily Sell-out","Por Loja":"By Store","Resumo do Mês":"Month Summary","Mês × Mês":"Month × Month","Por Modelo":"By Model","Produtividade (un./loja)":"Productivity (units/store)","Lojas por Mês":"Stores by Month","Lojas por Semana":"Stores by Week","Venda Perdida":"Lost Sales","Zeradas Hoje":"Out of Stock Today","Branch × Meta":"Branch × Target","Sugestão de Envio":"Shipment Suggestion","Comparativo Regionais":"Regional Comparison","Revendas (EA) · Sell-through":"Resellers (EA) · Sell-through","Reunião Vivo":"Vivo Meeting","Vendas":"Sales","Ruptura":"Stockout","Estoque":"Inventory","Planejamento":"Planning","Relatório Vivo":"Vivo Report","Promotores":"Promoters","Lançamento":"Launch","Acompanhamento de lançamento":"Launch tracking","Evolução Semanal":"Weekly Trend","Exportar cluster de cada modelo":"Export each model's cluster","Lojas Zeradas por Modelo":"Out-of-Stock Stores by Model","Regionais":"Regionals","Canais":"Channels","Concorrência":"Competition","Detalhe Lojas":"Store Detail","Visão Mensal":"Monthly View","Comparativo de Meses":"Month Comparison","Análise de Modelo":"Model Analysis","Estoque por Modelo":"Stock by Model","Jovi Mensal":"Jovi Monthly","Jovi Semanal":"Jovi Weekly","Lojas em Alta":"Top Stores","Acessórios":"Accessories",
 "Revendas (EA)":"Resellers (EA)","Venda Online":"Online Sales","Sell Out Retail Vivo":"Vivo Retail Sell Out","Visão por Branch":"Branch View","Abastecimento":"Replenishment","Fora do Cluster":"Out of Cluster","ⓘ Legenda":"ⓘ Legend","Visão por modelo":"By model",
 "Só aparelhos (sem fones), toda a venda Vivo: lojas do cadastro, lojas fora do cluster, online e revenda. Semana de segunda a domingo.":"Devices only (no earbuds), all Vivo sales: registered stores, stores outside the cluster, online and resellers. Week Monday to Sunday.",
 "Vendas Atual":"Current sales","Vendas LW":"LW sales","Modelo gerencial":"Model","Estoque Atual":"Current stock","Estoque Loja Atual":"Current store stock","DoS Loja":"Store DoS","Trânsito":"Transit","Estoque Atual + Trânsito":"Current stock + transit","Estoque CD Atual":"Current DC stock","DoS CD":"DC DoS","Vendas AVG L2W":"AVG L2W sales",
@@ -10519,6 +10522,124 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         scales:{ y:{beginAtZero:true, grid:{color:'#F0F0F1'}, border:{color:'var(--line)'}}, x:{grid:{display:false}, border:{color:'var(--line)'}, categoryPercentage:0.85, barPercentage:0.95} } } });
   }
 
+  // ---------------- EXCEL FORMATADO · ESTOQUE POR REGIONAL ----------------
+  function xlLoadZip(){ return new Promise((ok,bad)=>{ if(window.JSZip) return ok(window.JSZip); const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; sc.onload = ()=> window.JSZip ? ok(window.JSZip) : bad(new Error('zip')); sc.onerror = ()=>bad(new Error('zip')); document.head.appendChild(sc); }); }
+  async function xlDownload(nome, blob){
+    let dl = null; try{ if(window.claude && typeof window.claude.use==='function') dl = await window.claude.use('downloads'); }catch(e){}
+    if(dl){ try{ await dl.save({filename:nome, data:blob}); return 'ok'; }catch(e){ if(e && (e.code==='declined'||e.code==='rate_limited')) return e.code; } }
+    const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 60000); return 'ok';
+  }
+  // gera .xlsx com estilos (OOXML escrito à mão + JSZip). sheets: [{name, cols:[larguras], rows:[[{v,s}|null]], merges:['A1:C1'], freeze:{r,c}, filter:'A3:K40', tab:'660099'}]
+  async function xlBuild(sheets){
+    const JSZip = await xlLoadZip(); const z = new JSZip();
+    const esc = v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const col = n=>{ let s=''; n++; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; };
+    const sst = [], sIdx = {}; const si = t=>{ t = String(t); if(sIdx[t]==null){ sIdx[t] = sst.length; sst.push(t); } return sIdx[t]; };
+    // estilos: fonts / fills / borders / xfs
+    const fonts = ['<font><sz val="10"/><name val="Calibri"/></font>','<font><b/><sz val="16"/><color rgb="FF3A0059"/><name val="Calibri"/></font>','<font><sz val="10"/><color rgb="FF6B7280"/><name val="Calibri"/></font>',
+      '<font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>','<font><b/><sz val="10"/><color rgb="FFB3261E"/><name val="Calibri"/></font>','<font><i/><sz val="9"/><color rgb="FF9AA1AF"/><name val="Calibri"/></font>',
+      '<font><b/><sz val="10"/><color rgb="FF2A0040"/><name val="Calibri"/></font>','<font><b/><sz val="9"/><color rgb="FF660099"/><name val="Calibri"/></font>','<font><b/><sz val="10"/><color rgb="FF0A7A2A"/><name val="Calibri"/></font>','<font><b/><sz val="11"/><color rgb="FF3A0059"/><name val="Calibri"/></font>'];
+    const fill = c=>`<fill><patternFill patternType="solid"><fgColor rgb="FF${c}"/><bgColor indexed="64"/></patternFill></fill>`;
+    const fills = ['<fill><patternFill patternType="none"/></fill>','<fill><patternFill patternType="gray125"/></fill>', fill('3A0059'), fill('660099'), fill('FDECEA'), fill('F3F3F4'), fill('EEDFF5'), fill('1F6E4A'), fill('F1F8F4'), fill('F7F1FB'), fill('DDF3E3'), fill('FDF0CC')];
+    const borders = ['<border><left/><right/><top/><bottom/><diagonal/></border>','<border><left style="thin"><color rgb="FFE6E0EC"/></left><right style="thin"><color rgb="FFE6E0EC"/></right><top style="thin"><color rgb="FFE6E0EC"/></top><bottom style="thin"><color rgb="FFE6E0EC"/></bottom><diagonal/></border>',
+      '<border><left style="thin"><color rgb="FFE6E0EC"/></left><right style="thin"><color rgb="FFE6E0EC"/></right><top style="medium"><color rgb="FF3A0059"/></top><bottom style="thin"><color rgb="FFE6E0EC"/></bottom><diagonal/></border>'];
+    // [font, fill, border, numFmt, hAlign, wrap]
+    const X = { def:[0,0,0,0,null,0], title:[1,0,0,0,null,0], sub:[2,0,0,0,null,0], hd:[3,2,1,0,'center',1], hd2:[3,3,1,0,'center',1], hdg:[3,7,1,0,'center',1],
+      txt:[0,0,1,0,'left',0], txtb:[6,0,1,0,'left',0], num:[0,0,1,3,'center',0], zero:[4,4,1,3,'center',0], fora:[5,5,1,0,'center',0], nv:[5,0,1,0,'center',0],
+      ttxt:[6,6,2,0,'left',0], tnum:[6,6,2,3,'center',0], core:[7,0,1,0,'center',0], numg:[0,8,1,3,'center',0], tnumg:[6,6,2,3,'center',0],
+      ok:[8,10,1,0,'center',0], att:[0,11,1,0,'center',0], bad:[4,4,1,0,'center',0], sec:[9,0,0,0,null,0], numb:[6,9,1,3,'center',0] };
+    const keys = Object.keys(X), sid = {}; keys.forEach((k,i)=>sid[k]=i);
+    const xfs = keys.map(k=>{ const [f,fl,b,nf,h,w] = X[k]; return `<xf numFmtId="${nf}" fontId="${f}" fillId="${fl}" borderId="${b}" xfId="0"${nf?' applyNumberFormat="1"':''} applyFont="1" applyFill="1" applyBorder="1"${h||w?` applyAlignment="1"><alignment${h?` horizontal="${h}"`:''} vertical="center"${w?' wrapText="1"':''}/></xf>`:'/>'}`; });
+    const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="${borders.length}">${borders.join('')}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    const sheetXml = sh=>{
+      const rows = sh.rows.map((r,ri)=>{ const ht = (sh.heights||{})[ri]; const cells = (r||[]).map((c,ci)=>{ if(c==null) return ''; const ref = col(ci)+(ri+1), s = sid[c.s||'def']||0;
+          if(c.v==null || c.v==='') return `<c r="${ref}" s="${s}"/>`; if(typeof c.v==='number' && isFinite(c.v)) return `<c r="${ref}" s="${s}"><v>${c.v}</v></c>`; return `<c r="${ref}" s="${s}" t="s"><v>${si(c.v)}</v></c>`; }).join('');
+        return `<row r="${ri+1}"${ht?` ht="${ht}" customHeight="1"`:''}>${cells}</row>`; }).join('');
+      const fr = sh.freeze ? `<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane${sh.freeze.c?` xSplit="${sh.freeze.c}"`:''} ySplit="${sh.freeze.r}" topLeftCell="${col(sh.freeze.c||0)}${sh.freeze.r+1}" activePane="${sh.freeze.c?'bottomRight':'bottomLeft'}" state="frozen"/></sheetView></sheetViews>` : '<sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews>';
+      const cols = sh.cols ? `<cols>${sh.cols.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols>` : '';
+      const mg = (sh.merges||[]).length ? `<mergeCells count="${sh.merges.length}">${sh.merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>` : '';
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr>${sh.tab?`<tabColor rgb="FF${sh.tab}"/>`:''}<pageSetUpPr fitToPage="1"/></sheetPr>${fr}<sheetFormatPr defaultRowHeight="16"/>${cols}<sheetData>${rows}</sheetData>${sh.filter?`<autoFilter ref="${sh.filter}"/>`:''}${mg}<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`; };
+    sheets.forEach((sh,i)=>z.file(`xl/worksheets/sheet${i+1}.xml`, sheetXml(sh)));
+    z.file('xl/sharedStrings.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${sst.length}" uniqueCount="${sst.length}">${sst.map(t=>`<si><t xml:space="preserve">${esc(t)}</t></si>`).join('')}</sst>`);
+    z.file('xl/styles.xml', styles);
+    z.file('xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((sh,i)=>`<sheet name="${esc(sh.name.slice(0,31))}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets>${sheets.some(sh=>sh.filter)?`<definedNames>${sheets.map((sh,i)=>sh.filter?`<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${esc(sh.name.slice(0,31))}'!${sh.filter.replace(/([A-Z]+)(\d+)/g,'$$$1$$$2')}</definedName>`:'').join('')}</definedNames>`:''}</workbook>`);
+    z.file('xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((sh,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId${sheets.length+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>`);
+    z.file('_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`);
+    z.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${sheets.map((sh,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>`);
+    return z.generateAsync({type:'blob', mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression:'DEFLATE'});
+  }
+  async function exportEstoqueRegional(btn){
+    const old = btn ? btn.textContent : ''; if(btn){ btn.disabled = true; btn.textContent = 'Gerando Excel…'; }
+    try{
+      const SD = DATA.meta.stock_date || DATA.meta.reference_date, sdBR = SD.slice(8,10)+'/'+SD.slice(5,7)+'/'+SD.slice(0,4);
+      const VD = DATA.meta.reference_date, vdBR = VD.slice(8,10)+'/'+VD.slice(5,7);
+      const short = p=>p.replace(/^JOVI /,'').replace(/ 5G/,'').replace(/ \d+GB$/,'').replace('X300 ULTRA','X300 Ultra').replace('Y600 PRO','Y600 Pro');
+      const REGS = ['SP','SE','S','NE','N','MW'].filter(r=>DATA.stores.some(s=>s.regional===r));
+      const lojas = DATA.stores.filter(s=>!s.fechada);
+      const isAcc = p=>(DATA.products||[]).some(x=>x.product===p && x.is_accessory);
+      const MODS = (DATA.productOrder||[]).filter(p=>!isAcc(p) && lojas.some(s=>(s.products||[]).some(q=>q.product===p && ((q.estoque||0)+(q.transferencia||0)+(q.sales_30||0))>0 || (s.allowed_products||[]).includes(p))));
+      const PRE = window.PRELAUNCH || new Set();
+      const q = (s,p)=>(s.products||[]).find(x=>x.product===p)||{};
+      const inCl = (s,p)=>(s.allowed_products||[]).includes(p);
+      const dos = (e,v)=> v>0 ? Math.round(e/(v/30)) : null;
+      const C = (v,s)=>({v, s}); const N = (v,s)=>({v: (v==null?'':v), s: s||'num'});
+      const sheets = [];
+      // ---- Resumo ----
+      { const rows = [], merges = []; const nc = 2 + MODS.length + 6;
+        rows.push([C(`Estoque Jovi × Vivo por regional`, 'title')]); merges.push(`A1:${String.fromCharCode(64+Math.min(nc,26))}1`);
+        rows.push([C(`Base de estoque ${sdBR} (LVUT) · venda 30 dias até ${vdBR} · ${lojas.length} lojas do cadastro · aparelhos`, 'sub')]);
+        rows.push([]);
+        rows.push([C('Regional','hd'), C('Lojas','hd'), ...MODS.map(p=>C(`${short(p)}\nestoque loja`,'hd')), C('Total em loja','hd'), C('Em trânsito','hd'), C('No CD','hdg'), C('Venda 30 dias','hd'), C('DoS loja (dias)','hd'), C('Lojas c/ modelo zerado','hd')]);
+        const T = {n:0, m:{}, e:0, t:0, cd:0, v:0, z:0};
+        REGS.forEach(r=>{ const L = lojas.filter(s=>s.regional===r); const reg = (DATA.regionals||[]).find(x=>x.regional===r || x.name===r) || {};
+          const m = MODS.map(p=>L.reduce((a,s)=>a+(q(s,p).estoque||0),0)); const e = m.reduce((a,b)=>a+b,0);
+          const t = L.reduce((a,s)=>a+MODS.reduce((b,p)=>b+(q(s,p).transferencia||0),0),0); const v = L.reduce((a,s)=>a+MODS.reduce((b,p)=>b+(q(s,p).sales_30||0),0),0);
+          const cd = MODS.reduce((a,p)=>a+((reg.cd_stock_by_product||{})[p]||0),0);
+          const z = L.filter(s=>MODS.some(p=>inCl(s,p) && !PRE.has(p) && (q(s,p).estoque||0)<=0)).length;
+          rows.push([C(r,'txtb'), N(L.length), ...m.map(x=>N(x)), N(e,'numb'), N(t), N(cd,'numg'), N(v), N(dos(e,v)), N(z, z?'zero':'num')]);
+          T.n+=L.length; MODS.forEach((p,i)=>T.m[p]=(T.m[p]||0)+m[i]); T.e+=e; T.t+=t; T.cd+=cd; T.v+=v; T.z+=z; });
+        rows.push([C('Total','ttxt'), N(T.n,'tnum'), ...MODS.map(p=>N(T.m[p],'tnum')), N(T.e,'tnum'), N(T.t,'tnum'), N(T.cd,'tnumg'), N(T.v,'tnum'), N(dos(T.e,T.v),'tnum'), N(T.z,'tnum')]);
+        rows.push([]); rows.push([C('Abas seguintes: uma por regional (loja a loja) e uma do CD. Vermelho = modelo do cluster zerado na loja · cinza = fora do cluster.','sub')]);
+        sheets.push({name:'Resumo', tab:'3A0059', rows, merges, cols:[12,8,...MODS.map(()=>13),13,12,11,12,13,14], heights:{0:26, 3:32}, freeze:{r:4,c:1}}); }
+      // ---- uma aba por regional ----
+      REGS.forEach(r=>{
+        const L = lojas.filter(s=>s.regional===r).map(s=>({s, e:MODS.reduce((a,p)=>a+(q(s,p).estoque||0),0), t:MODS.reduce((a,p)=>a+(q(s,p).transferencia||0),0), v:MODS.reduce((a,p)=>a+(q(s,p).sales_30||0),0)})).sort((a,b)=>b.v-a.v || b.e-a.e || a.s.name.localeCompare(b.s.name));
+        const rows = [], merges = []; const fixed = 5, nc = fixed + MODS.length*3 + 4;
+        const L1 = c=>{ let s='', n=c+1; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; };
+        rows.push([C(`Estoque Jovi × Vivo — Regional ${r}`,'title')]); merges.push(`A1:${L1(nc-1)}1`);
+        rows.push([C(`Base de estoque ${sdBR} (LVUT) · venda 30 dias até ${vdBR} · ${L.length} lojas`,'sub')]); merges.push(`A2:${L1(nc-1)}2`);
+        rows.push([]);
+        const h1 = [C('Código','hd'), C('Loja','hd'), C('UF','hd'), C('Core','hd'), C('Promotor','hd')], h2 = [null,null,null,null,null];
+        MODS.forEach((p,i)=>{ const c0 = fixed + i*3; h1.push(C(short(p), i%2?'hd':'hd2'), C('', i%2?'hd':'hd2'), C('', i%2?'hd':'hd2')); h2.push(C('Estoque','hd'), C('Trânsito','hd'), C('Venda 30d','hd')); merges.push(`${L1(c0)}4:${L1(c0+2)}4`); });
+        h1.push(C('Total','hdg'), C('','hdg'), C('','hdg'), C('','hdg')); h2.push(C('Estoque','hdg'), C('Trânsito','hdg'), C('Venda 30d','hdg'), C('DoS (dias)','hdg')); merges.push(`${L1(fixed+MODS.length*3)}4:${L1(nc-1)}4`);
+        for(let i=0;i<fixed;i++) merges.push(`${L1(i)}4:${L1(i)}5`); h2.forEach((c,i)=>{ if(c==null) h2[i] = C('', 'hd'); });
+        rows.push(h1); rows.push(h2);
+        L.forEach(({s,e,t,v})=>{ const row = [C(s.code,'txt'), C(s.name,'txtb'), C(s.uf||'','txt'), C(s.core?'CORE':'','core'), C(s.promotor||'','txt')];
+          MODS.forEach(p=>{ if(!inCl(s,p) && !(q(s,p).estoque||q(s,p).sales_30)){ const c0 = row.length; merges.push(`${L1(c0)}${rows.length+1}:${L1(c0+2)}${rows.length+1}`); row.push(C('fora do cluster','fora'), C('','fora'), C('','fora')); return; }
+            const x = q(s,p), es = x.estoque||0; row.push(N(es, es<=0 && !PRE.has(p) ? 'zero' : 'num'), N(x.transferencia||0), N(x.sales_30||0)); });
+          const d = dos(e,v); row.push(N(e,'numb'), N(t), N(v), d==null ? C(e?'sem venda':'—','nv') : N(d)); rows.push(row); });
+        const tot = [C('','ttxt'), C(`Total ${r}`,'ttxt'), C('','ttxt'), C('','ttxt'), C('','ttxt')];
+        MODS.forEach(p=>{ tot.push(N(L.reduce((a,o)=>a+(q(o.s,p).estoque||0),0),'tnum'), N(L.reduce((a,o)=>a+(q(o.s,p).transferencia||0),0),'tnum'), N(L.reduce((a,o)=>a+(q(o.s,p).sales_30||0),0),'tnum')); });
+        const E = L.reduce((a,o)=>a+o.e,0), Tt = L.reduce((a,o)=>a+o.t,0), V = L.reduce((a,o)=>a+o.v,0); tot.push(N(E,'tnum'), N(Tt,'tnum'), N(V,'tnum'), N(dos(E,V),'tnum')); rows.push(tot);
+        rows.push([]); rows.push([C('Vermelho = modelo do cluster zerado na loja · cinza = modelo fora do cluster da loja · DoS = estoque ÷ venda média diária dos últimos 30 dias.','sub')]);
+        sheets.push({name:r, tab:'660099', rows, merges, cols:[8,34,5,7,11, ...MODS.flatMap(()=>[9,9,10]), 10,10,10,10], heights:{0:26, 3:20, 4:18}, freeze:{r:5,c:2}, filter:`A5:${L1(nc-1)}${5+L.length}`});
+      });
+      // ---- CD ----
+      { const rows = [], merges = []; const cdls = (DATA.cd && DATA.cd.byCdl) || [];
+        const qc = (x,p)=>((x.products||[]).find(z=>z.product===p)||{}).qty||0;
+        rows.push([C('Estoque no CD por CDL','title')]); merges.push('A1:H1');
+        rows.push([C(`Base ${sdBR} · CDs Vivo + Dark Store Berrini · aparelhos (LVUT)`,'sub')]); rows.push([]);
+        rows.push([C('CDL','hd'), C('Regionais Jovi','hd'), ...MODS.map(p=>C(short(p),'hd')), C('Total CD','hdg'), C('Nas lojas','hd'), C('Trânsito p/ lojas','hd')]);
+        cdls.filter(x=>MODS.some(p=>qc(x,p))||x.z5_loja).forEach(x=>{ const tt = MODS.reduce((a,p)=>a+qc(x,p),0); rows.push([C(x.cdl,'txtb'), C((x.regionais||[]).join(', '),'txt'), ...MODS.map(p=>N(qc(x,p))), N(tt,'numg'), N(x.z5_loja||0), N(x.transito_loja||0)]); });
+        rows.push([C('Total','ttxt'), C('','ttxt'), ...MODS.map(p=>N(cdls.reduce((a,x)=>a+qc(x,p),0),'tnum')), N(cdls.reduce((a,x)=>a+MODS.reduce((b,p)=>b+qc(x,p),0),0),'tnumg'), N(cdls.reduce((a,x)=>a+(x.z5_loja||0),0),'tnum'), N(cdls.reduce((a,x)=>a+(x.transito_loja||0),0),'tnum')]);
+        sheets.push({name:'CD', tab:'1F6E4A', rows, merges, cols:[22,18,...MODS.map(()=>12),11,11,13], heights:{0:26, 3:30}, freeze:{r:4,c:1}}); }
+      const blob = await xlBuild(sheets);
+      const r = await xlDownload(`Estoque_Jovi_Vivo_por_regional_${SD}.xlsx`, blob);
+      if(btn){ btn.textContent = r==='ok' ? '✓ Excel baixado' : r==='declined' ? 'Download cancelado' : 'Aguardando confirmação…'; setTimeout(()=>{ btn.textContent = old; btn.disabled = false; }, 3000); }
+    }catch(e){ console.error(e); if(btn){ btn.textContent = 'Não deu para gerar — tente de novo'; setTimeout(()=>{ btn.textContent = old; btn.disabled = false; }, 3500); } }
+  }
+
   // ---------------- ESTOQUE · LOJAS CORE ----------------
   let ecOpenS = null;
   function lcDetail(s, ctx){
@@ -11715,6 +11836,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   }
 
   document.querySelectorAll('.tab-btn[data-view="relvivo"]').forEach(b=>b.addEventListener('click', ()=>{ try{ renderRelVivo(); }catch(e){ console.error(e); } }));
+  document.addEventListener('click', e=>{ const xb = e.target.closest && e.target.closest('.xlreg-btn'); if(xb){ e.preventDefault(); exportEstoqueRegional(xb); } });
   document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#lang-toggle button[data-l]')) setTimeout(()=>{ try{ if(document.getElementById('rv-page').innerHTML) renderRelVivo(); }catch(err){ console.error(err); } }, 80); });
   // ---------------- DESTAQUES (Visão Geral) ----------------
   function renderDestaques(){
