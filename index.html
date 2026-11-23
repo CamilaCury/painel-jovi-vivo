@@ -3946,7 +3946,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ov.innerHTML = `<div class="mt-box" style="width:min(720px,100%);"><div class="mt-head"><div><div class="panel-title">Exportar tabela</div>
         <div class="panel-note" id="xf-why"></div></div><button type="button" class="mt-x" id="xf-x" aria-label="Fechar">×</button></div>
         <div class="xf-opts">
-          <div class="xf-opt"><b>⬇ Baixar arquivo</b><span>Para quem é da organização (acesso pela conta).</span><button type="button" class="mt-save" id="xf-dl">⬇ Baixar arquivo</button><div class="xf-msg" id="xf-dlmsg"></div></div>
+          <div class="xf-opt"><b>⬇ Baixar arquivo</b><span>Salva o arquivo no computador (pasta Downloads).</span><button type="button" class="mt-save" id="xf-dl">⬇ Baixar arquivo</button><div class="xf-msg" id="xf-dlmsg"></div></div>
           <div class="xf-opt"><b>📋 Copiar e colar no Excel</b><span>Funciona para qualquer pessoa, inclusive pelo link público: copie, abra o Excel ou Google Planilhas, clique na A1 e cole com Ctrl + V.</span><button type="button" class="mt-save" id="xf-copy">📋 Copiar tabela</button></div>
         </div>
         <textarea id="xf-txt" readonly spellcheck="false"></textarea>
@@ -3967,9 +3967,12 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         const m = ov.querySelector('#xf-dlmsg'); m.textContent = 'Abrindo a confirmação de download...'; m.className = 'xf-msg';
         let dl = null;
         try{ if(window.claude && typeof window.claude.use==='function') dl = await window.claude.use('downloads'); }catch(e){}
-        if(!dl){ m.textContent = 'Download indisponível por aqui (link público). Use "Copiar tabela" ao lado.'; m.className = 'xf-msg bad'; return; }
+        const browserDl = ()=>{ try{ const d = xfData.data; const blob = d instanceof Blob ? d : new Blob([d], {type: /\.xlsx$/i.test(xfData.nome) ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv;charset=utf-8'});
+            const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = xfData.nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 60000);
+            m.textContent = '✓ Arquivo baixado — confira a pasta Downloads.'; m.className = 'xf-msg ok'; return true; }catch(e){ return false; } };
+        if(!dl){ if(!browserDl()){ m.textContent = 'Não deu para baixar por aqui. Use "Copiar tabela" ao lado.'; m.className = 'xf-msg bad'; } return; }
         try{ await dl.save({filename:xfData.nome, data:xfData.data}); m.textContent = '✓ Arquivo salvo.'; m.className = 'xf-msg ok'; }
-        catch(e){ const c = e && e.code;
+        catch(e){ const c = e && e.code; if(c!=='declined' && c!=='rate_limited' && browserDl()) return;
           m.textContent = c==='declined' ? 'Download cancelado.' : c==='rate_limited' ? 'Já tem um download aguardando confirmação.' : 'Download indisponível por aqui (link público ou fora da organização). Use "Copiar tabela" ao lado.';
           m.className = 'xf-msg' + (c==='declined'||c==='rate_limited' ? '' : ' bad'); }
       };
