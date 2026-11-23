@@ -10583,6 +10583,9 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       const q = (s,p)=>(s.products||[]).find(x=>x.product===p)||{};
       const inCl = (s,p)=>(s.allowed_products||[]).includes(p);
       const dos = (e,v)=> v>0 ? Math.round(e/(v/30)) : null;
+      const cq = (s,p,c)=>(((q(s,p).colors)||[]).find(x=>x.color===c)||{});
+      const CORES = {}; MODS.forEach(p=>{ const set = new Set(); lojas.forEach(s=>((q(s,p).colors)||[]).forEach(x=>{ if(x.color && x.color!=='N/D' && ((x.estoque||0)+(x.transferencia||0)+(x.sales_30||0))>0) set.add(x.color); })); CORES[p] = [...set].sort(); });
+      const corNm = c=>String(c).toLowerCase().replace(/(^|\s)\S/g,m=>m.toUpperCase());
       const C = (v,s)=>({v, s}); const N = (v,s)=>({v: (v==null?'':v), s: s||'num'});
       const sheets = [];
       // ---- Resumo ----
@@ -10600,7 +10603,16 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
           rows.push([C(r,'txtb'), N(L.length), ...m.map(x=>N(x)), N(e,'numb'), N(t), N(cd,'numg'), N(v), N(dos(e,v)), N(z, z?'zero':'num')]);
           T.n+=L.length; MODS.forEach((p,i)=>T.m[p]=(T.m[p]||0)+m[i]); T.e+=e; T.t+=t; T.cd+=cd; T.v+=v; T.z+=z; });
         rows.push([C('Total','ttxt'), N(T.n,'tnum'), ...MODS.map(p=>N(T.m[p],'tnum')), N(T.e,'tnum'), N(T.t,'tnum'), N(T.cd,'tnumg'), N(T.v,'tnum'), N(dos(T.e,T.v),'tnum'), N(T.z,'tnum')]);
-        rows.push([]); rows.push([C('Abas seguintes: uma por regional (loja a loja) e uma do CD. Vermelho = modelo do cluster zerado na loja · cinza = fora do cluster.','sub')]);
+        // bloco por cor
+        { const L1 = c=>{ let s='', n=c+1; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; };
+          rows.push([]); rows.push([C('Estoque em loja por cor','sec')]);
+          const r0 = rows.length; const h1 = [C('Regional','hd'), C('','hd')], h2 = [C('','hd'), C('','hd')]; merges.push(`A${r0+1}:B${r0+2}`);
+          MODS.forEach((p,i)=>{ const cs = CORES[p]; if(!cs.length) return; const c0 = h1.length; cs.forEach((c,j)=>{ h1.push(C(j?'':short(p), i%2?'hd':'hd2')); h2.push(C(corNm(c),'hd')); }); if(cs.length>1) merges.push(`${L1(c0)}${r0+1}:${L1(c0+cs.length-1)}${r0+1}`); });
+          rows.push(h1); rows.push(h2);
+          REGS.forEach(r=>{ const L = lojas.filter(s=>s.regional===r); const row = [C(r,'txtb'), C('','txt')]; merges.push(`A${rows.length+1}:B${rows.length+1}`);
+            MODS.forEach(p=>CORES[p].forEach(c=>{ const v = L.reduce((a,s)=>a+(cq(s,p,c).estoque||0),0); row.push(N(v)); })); rows.push(row); });
+          const tr = [C('Total','ttxt'), C('','ttxt')]; merges.push(`A${rows.length+1}:B${rows.length+1}`); MODS.forEach(p=>CORES[p].forEach(c=>tr.push(N(lojas.reduce((a,s)=>a+(cq(s,p,c).estoque||0),0),'tnum')))); rows.push(tr); }
+        rows.push([]); rows.push([C('Abas seguintes: uma por regional (loja a loja, por modelo e por cor) e uma do CD. Vermelho = modelo/cor do cluster zerado na loja · cinza = fora do cluster.','sub')]);
         sheets.push({name:'Resumo', tab:'3A0059', rows, merges, cols:[12,8,...MODS.map(()=>13),13,12,11,12,13,14], heights:{0:26, 3:32}, freeze:{r:4,c:1}}); }
       // ---- uma aba por regional ----
       REGS.forEach(r=>{
@@ -10623,7 +10635,18 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         MODS.forEach(p=>{ tot.push(N(L.reduce((a,o)=>a+(q(o.s,p).estoque||0),0),'tnum'), N(L.reduce((a,o)=>a+(q(o.s,p).transferencia||0),0),'tnum'), N(L.reduce((a,o)=>a+(q(o.s,p).sales_30||0),0),'tnum')); });
         const E = L.reduce((a,o)=>a+o.e,0), Tt = L.reduce((a,o)=>a+o.t,0), V = L.reduce((a,o)=>a+o.v,0); tot.push(N(E,'tnum'), N(Tt,'tnum'), N(V,'tnum'), N(dos(E,V),'tnum')); rows.push(tot);
         rows.push([]); rows.push([C('Vermelho = modelo do cluster zerado na loja · cinza = modelo fora do cluster da loja · DoS = estoque ÷ venda média diária dos últimos 30 dias.','sub')]);
-        sheets.push({name:r, tab:'660099', rows, merges, cols:[8,34,5,7,11, ...MODS.flatMap(()=>[9,9,10]), 10,10,10,10], heights:{0:26, 3:20, 4:18}, freeze:{r:5,c:2}, filter:`A5:${L1(nc-1)}${5+L.length}`});
+        // estoque por cor (loja a loja)
+        { rows.push([]); rows.push([C(`Estoque por cor — Regional ${r}`,'sec')]);
+          const r0 = rows.length; const h1 = [C('Código','hd'), C('Loja','hd')], h2 = [C('','hd'), C('','hd')]; merges.push(`A${r0+1}:A${r0+2}`, `B${r0+1}:B${r0+2}`);
+          MODS.forEach((p,i)=>{ const cs = CORES[p]; if(!cs.length) return; const c0 = h1.length; cs.forEach((c,j)=>{ h1.push(C(j?'':short(p), i%2?'hd':'hd2')); h2.push(C(corNm(c),'hd')); }); if(cs.length>1) merges.push(`${L1(c0)}${r0+1}:${L1(c0+cs.length-1)}${r0+1}`); });
+          h1.push(C('Total','hdg')); h2.push(C('','hdg')); merges.push(`${L1(h1.length-1)}${r0+1}:${L1(h1.length-1)}${r0+2}`);
+          rows.push(h1); rows.push(h2);
+          L.forEach(({s,e})=>{ const row = [C(s.code,'txt'), C(s.name,'txtb')];
+            MODS.forEach(p=>{ const cs = CORES[p]; if(!cs.length) return; if(!inCl(s,p) && !(q(s,p).estoque||q(s,p).sales_30)){ const c0 = row.length; if(cs.length>1) merges.push(`${L1(c0)}${rows.length+1}:${L1(c0+cs.length-1)}${rows.length+1}`); cs.forEach((c,j)=>row.push(C(j?'':'fora do cluster','fora'))); return; }
+              cs.forEach(c=>{ const v = cq(s,p,c).estoque||0; row.push(N(v, v<=0 && !PRE.has(p) ? 'zero' : 'num')); }); });
+            row.push(N(e,'numb')); rows.push(row); });
+          const tr = [C('','ttxt'), C(`Total ${r}`,'ttxt')]; MODS.forEach(p=>CORES[p].forEach(c=>tr.push(N(L.reduce((a,o)=>a+(cq(o.s,p,c).estoque||0),0),'tnum')))); tr.push(N(L.reduce((a,o)=>a+o.e,0),'tnum')); rows.push(tr); }
+        sheets.push({name:r, tab:'660099', rows, merges, cols:[8,34,10,10,11, ...MODS.flatMap(()=>[10,10,10]), 10,10,10,10], heights:{0:26, 3:20, 4:18}, freeze:{r:5,c:2}, filter:`A5:${L1(nc-1)}${5+L.length}`});
       });
       // ---- CD ----
       { const rows = [], merges = []; const cdls = (DATA.cd && DATA.cd.byCdl) || [];
