@@ -683,6 +683,12 @@
   table.bv tr.bv-tot td.bv-act b{background:transparent;}
   table.bv tr.bv-tot td.bv-act .bv-up{color:#9FF0C9 !important;}
   table.bv .bv-of{font-size:9px; opacity:.7;}
+  .bv-legend{margin-top:12px; border:1px solid var(--line-2); border-radius:10px; background:#fff; padding:10px 14px; font-size:11.5px; color:var(--ink-700); display:flex; flex-direction:column; gap:7px; line-height:1.45;}
+  .bv-lg-row{display:grid; grid-template-columns:150px minmax(0,1fr); gap:10px; align-items:baseline;} .bv-lg-items{display:flex; flex-wrap:wrap; gap:4px 18px;}
+  .bv-lg-t{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-900);}
+  .bv-lg-i{white-space:nowrap;} .bv-lg-i b{color:var(--ink-900);} .bv-lg-wide{white-space:normal; flex:1 1 400px;}
+  .bv-lg-dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:-1px; box-shadow:0 0 0 1px rgba(0,0,0,.15);}
+  .bv-legend .bv-ns{color:#8A8A90; font-style:italic; font-weight:600;} .bv-legend .bv-up{color:#1A9463;} .bv-legend .bv-dn{color:#D2322B;}
   table.bv .bv-ns{color:#8A8A90; font-weight:600; font-size:9px; font-style:italic;}
   table.bv tr.bv-tot .bv-ns{color:#DCDCE0;}
   .bv-ov .bv-pot{background:#F7F1FB;}
@@ -2132,7 +2138,7 @@
     </div>
     <div id="bv-wrap"><table class="bv" id="bv-table"></table></div>
     <div class="bv-overall" id="bv-overall"></div>
-    <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 dias ou sem venda nas últimas 4 semanas (s/ venda); acima de 999 dias aparece 999+.</div>
+    <div class="bv-legend" id="bv-legend" data-noi18n></div>
   </div>
 
   <div class="view" id="view-metodo">
@@ -8335,10 +8341,33 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   }
   function bvSaveTargets(){ try{ localStorage.setItem('bv_targets_vivo_'+bvMon(), JSON.stringify(bvTargets)); }catch(e){} }
   function bvIsoWeek(iso){ return Number(isoWeekLabel(iso).slice(1)); }
+  function bvEN(){ return (document.documentElement.getAttribute('lang')||'').toLowerCase().startsWith('en'); }
+  function bvLegend(){
+    const el = document.getElementById('bv-legend'); if(!el) return; const en = bvEN(), L = (p,e)=> en ? e : p;
+    const dot = c=>`<span class="bv-lg-dot" style="background:${c};"></span>`, W = en ? '4W' : '4S';
+    el.innerHTML = `<div class="bv-lg-row"><span class="bv-lg-t">${L('DoS · dias de estoque','DoS · days of stock')}</span>
+      <span class="bv-lg-i">${dot('#1F1F1F')}0 = ${L('sem estoque','no stock')}</span>
+      <span class="bv-lg-i">${dot('#3E9C79')}${L('abaixo de 60 dias','under 60 days')}</span>
+      <span class="bv-lg-i">${dot('#E3B55A')}${L('60 a 90 dias','60 to 90 days')}</span>
+      <span class="bv-lg-i">${dot('#D2322B')}${L('acima de 90 dias','over 90 days')}</span>
+      <span class="bv-lg-i">${dot('#D2322B')}<i class="bv-ns">${L('s/ venda','no sales')}</i> = ${L('tem estoque, mas não vendeu nas últimas 4 semanas','has stock but no sales in the last 4 weeks')}</span>
+      <span class="bv-lg-i">${dot('#D2322B')}<b>999+</b> = ${L('mais de 999 dias','over 999 days')}</span></div>
+    <div class="bv-lg-row"><span class="bv-lg-t">${L('Colunas','Columns')}</span>
+      <span class="bv-lg-i"><b>RESULT</b> ${L('venda do mês','month sales')}</span>
+      <span class="bv-lg-i"><b>ACHIEVE</b> RESULT ÷ TARGET</span>
+      <span class="bv-lg-i"><b>TOTAL (${W})</b> ${L('soma das 4 semanas','sum of the 4 weeks')}</span>
+      <span class="bv-lg-i"><b>DoS</b> ${L('estoque (+ CD na 1ª coluna) ÷ venda média diária das 4 semanas','stock (+ DC in the 1st column) ÷ average daily sales of the 4 weeks')}</span>
+      <span class="bv-lg-i"><b>% ${L('ESTQ','STOCK')} / % SO</b> ${L('fatia do branch no total do modelo','branch share of the model total')}</span>
+      <span class="bv-lg-i"><b>DELTA</b> % SO − % ${L('ESTQ','STOCK')} (<span class="bv-up">▲</span> ${L('vende mais do que a fatia de estoque','sells more than its stock share')})</span>
+      <span class="bv-lg-i"><span class="bv-up">▲</span><span class="bv-dn">▼</span> ${L('última semana vs média das 3 anteriores','last week vs average of the 3 before')}</span>
+      <span class="bv-lg-i"><b>*</b> ${L('semana em andamento','week in progress')}</span></div>
+    <div class="bv-lg-row"><span class="bv-lg-t">${L('Metas','Targets')}</span><span class="bv-lg-i bv-lg-wide">${L('Botão <b>🎯 Metas do mês</b>: escolha o mês, digite as metas ou baixe/suba o Excel. Também dá para editar direto na coluna TARGET. Ficam salvas neste navegador, por mês.', '<b>🎯 Monthly targets</b> button: pick the month, type the targets or download/upload the Excel. You can also edit the TARGET column directly. Saved in this browser, by month.')}</span></div>`;
+    el.querySelectorAll('.bv-lg-row').forEach(r=>{ const t=r.querySelector('.bv-lg-t'), w=document.createElement('div'); w.className='bv-lg-items'; [...r.children].filter(c=>c!==t).forEach(c=>w.appendChild(c)); r.appendChild(w); });
+  }
   function bvDot(dos, stock){
     let c, v;
     if(!stock){ c='#1F1F1F'; v='0'; }
-    else if(dos===null){ c='#D2322B'; v='<span class="bv-ns" title="Tem estoque mas não vendeu nas últimas 4 semanas">s/ venda</span>'; }
+    else if(dos===null){ c='#D2322B'; v=`<span class="bv-ns">${bvEN()?'no sales':'s/ venda'}</span>`; }
     else { v = dos>=999 ? '999+' : fmtInt(dos); c = dos<60 ? '#3E9C79' : dos<=90 ? '#E3B55A' : '#D2322B'; }
     return `<span class="bv-dot" style="background:${c};"></span>${v}`;
   }
@@ -8350,10 +8379,10 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const monthStart = `${ry}-${String(rm).padStart(2,'0')}-01`, monthEnd = new Date(Date.UTC(ry,rm,0)).toISOString().slice(0,10);
     const REFISO = monthEnd<REF0 ? monthEnd : REF0;
     // filtro de mês
-    { const el = document.getElementById('bv-month'); if(el){ const MESN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    { const el = document.getElementById('bv-month'); if(el){ const MESN = bvEN() ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] : ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
       const first = (DATA.devSales||[]).reduce((a,x)=>x.d<a?x.d:a, REF0); const L=[]; let [fy,fm]=first.split('-').map(Number); const [cy,cm]=REF0.split('-').map(Number);
       while(fy<cy || (fy===cy && fm<=cm)){ L.push(String(fm).padStart(2,'0')+'/'+fy); fm++; if(fm>12){fm=1;fy++;} }
-      el.innerHTML = '<span style="font-size:11.5px; font-weight:700; color:var(--ink-700); margin:0 6px 0 4px; align-self:center;">Mês</span>'+L.slice(-6).map(l=>`<button type="button" data-m="${l}" class="${l===MON?'on':''}">${MESN[+l.slice(0,2)-1]}${l===DATA.meta.month_label?'':'/'+l.slice(5,7)}</button>`).join('');
+      el.innerHTML = '<span style="font-size:11.5px; font-weight:700; color:var(--ink-700); margin:0 6px 0 4px; align-self:center;">'+(bvEN()?'Month':'Mês')+'</span>'+L.slice(-6).map(l=>`<button type="button" data-m="${l}" class="${l===MON?'on':''}">${MESN[+l.slice(0,2)-1]}${l===DATA.meta.month_label?'':'/'+l.slice(5,7)}</button>`).join('');
       el.querySelectorAll('button').forEach(bt=>bt.onclick=()=>{ bvMonth = bt.dataset.m===DATA.meta.month_label?null:bt.dataset.m; bvTargets=null; bvSumSel=null; const y=window.scrollY; renderBranchView(); window.scrollTo(0,y); }); } }
     // semanas: as 5 últimas semanas ISO até a data da última venda
     const weeks = []; { let d = new Date(REFISO+'T00:00:00Z'); const dow=(d.getUTCDay()+6)%7; let mon = new Date(d.getTime()-dow*86400000);
@@ -8589,7 +8618,8 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     };
     bvSummary();
     const parcial = weeks[3].end>REFISO;
-    document.getElementById('bv-note').innerHTML = `${MON!==DATA.meta.month_label?`<b style="color:#660099;">Vendo ${MON} (mês fechado).</b> Estoque, CD e DoS são a posição atual. `:''}Sell-out das 70 lojas do cadastro, só aparelhos (sem fones), semana de segunda a domingo. Mostra as 4 últimas semanas até ${fmtDate(REFISO)} (${weeks[0].label} a ${weeks[3].label}${parcial?`, a ${weeks[3].label} ${REFISO===REF0?'ainda em andamento':'cortada no fim do mês'} (*)`:''}). RESULT = sell-out de ${MON} até ${fmtDate(REFISO)}. TOTAL (4S) = ${weeks[0].label} a ${weeks[3].label} (${fmtDate(w4Start)} a ${fmtDate(REFISO)}). DoS (estoque) = (total + CD) ÷ venda média diária das 4 semanas; DoS (4S) e DoS dos promotores = estoque loja + trânsito ÷ venda média diária das 4 semanas. % ESTQ / % SO = participação do branch no total nacional do modelo.`;
+    document.getElementById('bv-note').innerHTML = bvEN() ? `${MON!==DATA.meta.month_label?`<b style="color:var(--blue-700,#660099);">Viewing ${MON} (closed month).</b> Stock, DC and DoS are today's position. `:''}Sell-out of the 70 registered stores, devices only, weeks Monday to Sunday: last 4 weeks up to ${fmtDate(REFISO)} (${weeks[0].label} to ${weeks[3].label}${parcial?`, ${weeks[3].label} ${REFISO===REF0?'in progress':'cut at month end'} *`:''}). RESULT = ${MON} sales through ${fmtDate(REFISO)}.` : `${MON!==DATA.meta.month_label?`<b style="color:var(--blue-700,#660099);">Vendo ${MON} (mês fechado).</b> Estoque, CD e DoS são a posição atual. `:''}Sell-out das 70 lojas do cadastro, só aparelhos, semana de segunda a domingo: 4 últimas semanas até ${fmtDate(REFISO)} (${weeks[0].label} a ${weeks[3].label}${parcial?`, ${weeks[3].label} ${REFISO===REF0?'em andamento':'cortada no fim do mês'} *`:''}). RESULT = venda de ${MON} até ${fmtDate(REFISO)}.`;
+    bvLegend();
     host.querySelectorAll('input.bv-in').forEach(inp=>inp.addEventListener('change', ()=>{
       const v = Math.max(0, parseFloat(inp.value)||0); (bvTargets[inp.dataset.b]||(bvTargets[inp.dataset.b]={}))[inp.dataset.m]=v; bvSaveTargets();
       const y = window.scrollY; renderBranchView(); window.scrollTo(0,y); }));
@@ -11879,7 +11909,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
 
   document.querySelectorAll('.tab-btn[data-view="relvivo"]').forEach(b=>b.addEventListener('click', ()=>{ try{ renderRelVivo(); }catch(e){ console.error(e); } }));
   document.addEventListener('click', e=>{ const xb = e.target.closest && e.target.closest('.xlreg-btn'); if(xb){ e.preventDefault(); exportEstoqueRegional(xb); } });
-  document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#lang-toggle button[data-l]')) setTimeout(()=>{ try{ if(document.getElementById('rv-page').innerHTML) renderRelVivo(); }catch(err){ console.error(err); } }, 80); });
+  document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#lang-toggle button[data-l]')) setTimeout(()=>{ try{ renderBranchView(); }catch(err){} try{ if(document.getElementById('rv-page').innerHTML) renderRelVivo(); }catch(err){ console.error(err); } }, 80); });
   // ---------------- DESTAQUES (Visão Geral) ----------------
   function renderDestaques(){
     const box = document.getElementById('dq-list'); if(!box) return;
