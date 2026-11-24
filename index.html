@@ -108,6 +108,13 @@
   .acc-red{color:#B3261E; font-weight:800;}
   .acc-chips{display:flex; gap:6px; flex-wrap:wrap;} .acc-chips button{font-family:inherit; font-size:11.5px; font-weight:600; border:1px solid var(--line); background:#fff; color:var(--ink-700); border-radius:999px; padding:5px 12px; cursor:pointer;} .acc-chips button b{margin-left:3px;} .acc-chips button.on{background:#660099; border-color:#660099; color:#fff;}
   table.acc-tb th.r, table.acc-tb td.r{text-align:right;}
+  .chart-box-lg.rvp{display:flex; flex-direction:column; gap:14px; align-items:stretch; height:auto !important;}
+  .rvp-c{position:relative; height:150px; width:150px; margin:0 auto;} .rvp-tot{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;} .rvp-tot b{font-size:22px; font-weight:800; color:var(--ink-900); line-height:1;} .rvp-tot span{font-size:10.5px; color:var(--ink-500);}
+  .rvp-leg{display:grid; grid-template-columns:10px max-content minmax(40px,1fr) 30px 44px; gap:7px; align-items:center; min-width:0; font-size:12px;}
+  .rvp-r{display:contents;}
+  .rvp-d{width:10px; height:10px; border-radius:3px;} .rvp-n{font-weight:700; color:var(--ink-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .rvp-b{height:8px; background:var(--surface-100); border-radius:99px; overflow:hidden;} .rvp-b i{display:block; height:100%; border-radius:99px;}
+  .rvp-v{text-align:right; font-weight:700; color:var(--ink-900); font-variant-numeric:tabular-nums;} .rvp-p{text-align:right; color:var(--ink-500); font-variant-numeric:tabular-nums;}
   .tg-btn:hover{border-color:#660099; color:#660099;}
   .tab-btn, .tg-btn{text-transform:capitalize;}
   .tg-btn{background:#F4ECFA; border-color:#E4D2F0; color:#4B0073;} .tg-btn:not(.on):hover{background:#EBDDF6;}
@@ -7318,14 +7325,17 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     rvDestroy(key);
     const total = Math.max(1, entries.reduce((a,[,v])=>a+v,0));
     const pcts = entries.map(([,v])=>Math.round(v/total*1000)/10);
-    const el = document.getElementById(canvasId); if(!el) return;
+    let el = document.getElementById(canvasId); if(!el) return;
+    let box = el.parentElement;
+    if(!box.classList.contains('rvp')){ box.classList.add('rvp'); box.innerHTML = `<div class="rvp-c"><canvas id="${canvasId}"></canvas><div class="rvp-tot"></div></div><div class="rvp-leg"></div>`; el = document.getElementById(canvasId); }
+    const cols = entries.map(([k],i)=>colorFor(k,i)), nm = k=> String(k).replace('JOVI ','').replace(/ 5G/,'').replace(/ \d+GB$/,'');
+    const mx = Math.max(1, ...entries.map(([,v])=>v));
+    box.querySelector('.rvp-tot').innerHTML = `<b>${fmtInt(total)}</b><span>un.</span>`;
+    box.querySelector('.rvp-leg').innerHTML = entries.map(([k,v],i)=>`<div class="rvp-r" title="${k}: ${fmtInt(v)} un."><span class="rvp-d" style="background:${cols[i]}"></span><span class="rvp-n">${nm(k)}</span><span class="rvp-b"><i style="width:${(v/mx*100).toFixed(1)}%; background:${cols[i]}"></i></span><span class="rvp-v">${fmtInt(v)}</span><span class="rvp-p">${pcts[i].toString().replace('.',',')}%</span></div>`).join('');
     rvCharts[key] = new Chart(el, {
       type:'doughnut',
-      data:{ labels:entries.map(([k])=>k), datasets:[{ data:entries.map(([,v])=>v), pctLabels:pcts.map(p=>p>=6?p.toString().replace('.',','):null),
-        backgroundColor:entries.map(([k],i)=>colorFor(k,i)), borderColor:'#fff', borderWidth:2 }]},
-      plugins:[pieSliceLabelPlugin],
-      options:{ cutout:'42%', plugins:{ legend:{position:'right', labels:{usePointStyle:true, pointStyle:'rect', boxWidth:8, boxHeight:8, padding:8, font:{size:10.5},
-          generateLabels:ch=>ch.data.labels.map((l,i)=>({text:`${l.replace('JOVI ','')} · ${pcts[i].toString().replace('.',',')}%`, fillStyle:ch.data.datasets[0].backgroundColor[i], strokeStyle:'#fff', lineWidth:0, index:i}))}},
+      data:{ labels:entries.map(([k])=>k), datasets:[{ data:entries.map(([,v])=>v), backgroundColor:cols, borderColor:'#fff', borderWidth:2, hoverOffset:5 }]},
+      options:{ cutout:'64%', maintainAspectRatio:false, plugins:{ legend:{display:false},
         tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmtInt(ctx.raw)} un. (${pcts[ctx.dataIndex].toString().replace('.',',')}%)`}}} }
     });
   }
