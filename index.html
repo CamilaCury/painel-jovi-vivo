@@ -549,7 +549,8 @@
   #dl-table tbody tr.dl-total td:first-child{background:var(--surface-50);}
 
   /* zoom control */
-  .zoomctl{display:flex; align-items:center; gap:1px; flex:none; padding:4px 18px 4px 0;}
+  .zoomctl{display:flex; align-items:center; gap:1px; flex:none; position:fixed; top:10px; right:16px; z-index:500; padding:3px; background:#fff; border-radius:8px; box-shadow:0 2px 10px rgba(30,0,50,.18);}
+  @media print{ .zoomctl{display:none !important;} }
   .zoomctl button{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-700); background:var(--surface-50); border:1px solid var(--line); cursor:pointer; padding:4px 9px; line-height:1.2;}
   .zoomctl button:first-child{border-radius:6px 0 0 6px;}
   .zoomctl button:last-child{border-radius:0 6px 6px 0;}
