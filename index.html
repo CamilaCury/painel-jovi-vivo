@@ -83,6 +83,16 @@
   .tabwrap{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:8px;}
   .tgroups{display:flex; flex-wrap:wrap; gap:6px;}
   .tg-btn{font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:700; padding:9px 15px; border-radius:9px; border:1px solid var(--line); background:#fff; color:var(--ink-700); cursor:pointer; white-space:nowrap;}
+  .jm-share{display:grid; grid-template-columns:220px minmax(0,1fr); gap:22px; align-items:center; min-height:260px;}
+  .jm-share-chart{position:relative; height:220px;}
+  .jm-share-c{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;}
+  .jm-share-c b{font-size:26px; font-weight:800; color:var(--ink-900); line-height:1;} .jm-share-c span{font-size:11px; color:var(--ink-500); margin-top:4px;}
+  .jm-share-leg{display:flex; flex-direction:column; gap:9px;}
+  .jm-sl{display:grid; grid-template-columns:12px 34px minmax(0,1fr) 44px 52px; gap:10px; align-items:center; font-size:13px;}
+  .jm-sl-dot{width:12px; height:12px; border-radius:3px;} .jm-sl-r{color:var(--ink-900);}
+  .jm-sl-bar{height:10px; background:var(--surface-100); border-radius:99px; overflow:hidden;} .jm-sl-bar i{display:block; height:100%; border-radius:99px;}
+  .jm-sl-v{text-align:right; font-weight:700; color:var(--ink-900); font-variant-numeric:tabular-nums;} .jm-sl-p{text-align:right; color:var(--ink-500); font-variant-numeric:tabular-nums;}
+  @media (max-width:700px){ .jm-share{grid-template-columns:1fr;} }
   .tg-btn:hover{border-color:#660099; color:#660099;}
   .tab-btn, .tg-btn{text-transform:capitalize;} .tab-btn.tab-help, .tg-btn[data-g^="ⓘ"]{text-transform:none;}
   .tg-btn.on{background:#660099; border-color:#660099; color:#fff;}
@@ -2197,7 +2207,7 @@
     <div class="grid-2" style="margin-top:14px;">
       <div class="panel">
         <div class="panel-head"><div class="panel-title">Month Sales — share por regional</div></div>
-        <div class="chart-box-lg" style="height:260px;"><canvas id="chart-jm-share"></canvas></div>
+        <div class="jm-share"><div class="jm-share-chart"><canvas id="chart-jm-share"></canvas><div class="jm-share-c" id="jm-share-center"></div></div><div class="jm-share-leg" id="jm-share-leg"></div></div>
       </div>
       <div class="panel">
         <div class="panel-head"><div class="panel-title">Vendas por regional (mês)</div></div>
@@ -9188,19 +9198,20 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       kpi('DoS geral', dosGeral!==null?dosGeral+' dias':'—', 'giro dos últimos dias vs. estoque total');
 
     // Gráfico: Month Sales — pizza de share por regional
-    const EXCEL_COLORS = ['#660099','#A05EC1','#B57CD1','#3A0059','#0050C8','#CBA3DF','#002B80','#E0C8EC'];
+    const EXCEL_COLORS = ['#4B0073','#660099','#8A3DB8','#A86BCB','#C49ADB','#DCC6EA','#EEE3F5','#F6F0FA'];
     const regSorted = [...regs].map(r=>({ r, val: prods.reduce((a,p)=>a+(p.per_regional_month[r]||0),0) })).sort((a,b)=>b.val-a.val);
     const shareData = regSorted.filter(x=>x.val>0);
     const shareTotal = Math.max(1, shareData.reduce((a,x)=>a+x.val,0));
     const pctLabels = shareData.map(x=>Math.round(x.val/shareTotal*1000)/10);
     if(chartJmShare) chartJmShare.destroy();
     chartJmShare = new Chart(document.getElementById('chart-jm-share'), {
-      type:'pie',
-      data:{ labels:shareData.map(x=>x.r), datasets:[{ data:shareData.map(x=>x.val), pctLabels,
-        backgroundColor:EXCEL_COLORS, borderColor:'#fff', borderWidth:2 }]},
-      plugins:[pieSliceLabelPlugin],
-      options:{ plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmtInt(ctx.raw)} un. (${pctLabels[ctx.dataIndex]}%)`}}} }
+      type:'doughnut',
+      data:{ labels:shareData.map(x=>x.r), datasets:[{ data:shareData.map(x=>x.val),
+        backgroundColor:EXCEL_COLORS, borderColor:'#fff', borderWidth:3, hoverOffset:6 }]},
+      options:{ cutout:'62%', maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${fmtInt(ctx.raw)} un. (${pctLabels[ctx.dataIndex].toString().replace('.',',')}%)`}}} }
     });
+    document.getElementById('jm-share-center').innerHTML = `<b>${fmtInt(shareTotal)}</b><span>un. no mês</span>`;
+    document.getElementById('jm-share-leg').innerHTML = shareData.map((x,i)=>`<div class="jm-sl"><span class="jm-sl-dot" style="background:${EXCEL_COLORS[i]}"></span><b class="jm-sl-r">${x.r}</b><span class="jm-sl-bar"><i style="width:${(x.val/shareData[0].val*100).toFixed(1)}%; background:${EXCEL_COLORS[i]}"></i></span><span class="jm-sl-v">${fmtInt(x.val)}</span><span class="jm-sl-p">${pctLabels[i].toString().replace('.',',')}%</span></div>`).join('');
 
     // Gráfico: vendas por regional (mês) — estilo Excel (barra reta, grade nos dois eixos)
     if(chartJmRegional) chartJmRegional.destroy();
