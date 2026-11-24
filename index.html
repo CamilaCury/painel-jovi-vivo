@@ -126,6 +126,19 @@
   .oj-pc{display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 12px; background:#F7F1FB; border:1px solid #E6D6F0; border-radius:10px; margin:0 0 4px; font-size:12px;}
   .ojp-seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#fff;} .ojp-seg button{font-family:inherit; font-size:12px; font-weight:600; padding:6px 14px; border:none; background:transparent; color:var(--ink-700); cursor:pointer;} .ojp-seg button.on{background:#660099; color:#fff;}
   .ojp-months{display:flex; gap:6px; flex-wrap:wrap;} .ojp-months button{font-family:inherit; font-size:11.5px; font-weight:700; padding:5px 11px; border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--ink-700); cursor:pointer;} .ojp-months button.on{background:#660099; border-color:#660099; color:#fff;}
+  .vt-box{margin-top:14px;} .vt-chips{display:flex; gap:5px; flex-wrap:wrap;} .vt-chips button{font-family:inherit; font-size:11.5px; font-weight:700; padding:5px 11px; border:1px solid #E4D2F0; border-radius:999px; background:#F4ECFA; color:#4B0073; cursor:pointer;} .vt-chips button.on{background:#660099; border-color:#660099; color:#fff;}
+  .vt-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1.3fr); gap:22px; align-items:start;}
+  @media (max-width:1100px){ .vt-grid{grid-template-columns:1fr;} }
+  .vt-l{display:block; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-500); margin-bottom:6px;}
+  .vt-main b{font-size:40px; font-weight:800; color:#660099; line-height:1; letter-spacing:-.02em;} .vt-main small{display:block; font-size:12px; color:var(--ink-500); margin-top:4px;}
+  .vt-stack{display:flex; height:10px; border-radius:99px; overflow:hidden; margin:12px 0 10px; background:var(--surface-100);} .vt-stack i{display:block; height:100%;}
+  .vt-ch{display:flex; flex-direction:column; gap:5px;} .vt-ch div{display:grid; grid-template-columns:10px 1fr auto 48px; gap:8px; align-items:center; font-size:12.5px;} .vt-ch b{font-size:13px; color:var(--ink-900);} .vt-ch em, .vt-r em{font-style:normal; color:var(--ink-500); text-align:right; font-variant-numeric:tabular-nums;}
+  .vt-d{width:10px; height:10px; border-radius:3px;}
+  .vt-r{display:grid; grid-template-columns:128px minmax(30px,1fr) 46px 48px; gap:8px; align-items:center; font-size:12.5px; padding:3px 0;} .vt-r span:first-child{font-weight:700; color:var(--ink-900); white-space:nowrap;} .vt-r b{text-align:right;}
+  .vt-b{height:10px; background:var(--surface-100); border-radius:99px; overflow:hidden;} .vt-b i{display:block; height:100%; background:linear-gradient(90deg,#A86BCB,#660099); border-radius:99px;}
+  .vt-bars{display:flex; gap:6px; align-items:flex-end; height:150px;} .vt-bc{flex:1; min-width:0; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:3px; border:none; background:transparent; cursor:pointer; padding:0; font-family:inherit;}
+  .vt-bc i{display:block; width:100%; max-width:38px; background:#D8C2EA; border-radius:5px 5px 0 0;} .vt-bc:hover i{background:#A86BCB;} .vt-bc.on i{background:#660099;}
+  .vt-bc b{font-size:11px; font-weight:800; color:var(--ink-900);} .vt-bc span{font-size:10px; color:var(--ink-500); white-space:nowrap;}
   .tg-btn:hover{border-color:#660099; color:#660099;}
   .tab-btn, .tg-btn{text-transform:capitalize;}
   .tg-btn{background:#F4ECFA; border-color:#E4D2F0; color:#4B0073;} .tg-btn:not(.on):hover{background:#EBDDF6;}
@@ -1326,6 +1339,7 @@
   <!-- ============ VISÃO GERAL ============ -->
   <div class="view active" id="view-overview">
     <div class="panel dq-box" id="dq-box"><div class="panel-head" style="margin-bottom:8px;"><div><div class="panel-title">Destaques de hoje</div><div class="panel-note" id="dq-note"></div></div></div><div class="dq-list" id="dq-list"></div></div>
+    <div class="panel vt-box" id="vt-box"></div>
     <div class="panel">
       <div class="panel-head">
         <div>
@@ -5234,6 +5248,41 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   window.I18N = I18N;
   setTimeout(() => I18N.init(), 0);
 
+  // ---------------- VENDA TOTAL (desde o início, ou por mês) ----------------
+  let vtSel = 'all';
+  function renderVendaTotal(){
+    const el = document.getElementById('vt-box'); if(!el) return;
+    const EN = (document.documentElement.getAttribute('lang')||'').startsWith('en'), L = (pt,en)=> EN ? en : pt;
+    const A = (DATA.allDev||[]).filter(x=>(!regionalFilter || x.rg===regionalFilter) && (!modelFilter || x.p===modelFilter));
+    if(!A.length){ el.innerHTML=''; return; }
+    const months = [...new Set(A.map(x=>x.d.slice(0,7)))].sort();
+    if(vtSel!=='all' && !months.includes(vtSel)) vtSel = 'all';
+    const MN = EN ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] : ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const ref = DATA.meta.reference_date, curM = ref.slice(0,7);
+    const lab = m=> `${MN[+m.slice(5,7)-1]}/${m.slice(2,4)}${m===curM?'*':''}`;
+    const S = vtSel==='all' ? A : A.filter(x=>x.d.startsWith(vtSel));
+    const tot = S.reduce((a,x)=>a+x.q,0);
+    const first = A.reduce((a,x)=>x.d<a?x.d:a, ref), last = S.reduce((a,x)=>x.d>a?x.d:a, '0');
+    const dd = iso=> iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
+    const CH = [['LOJA',L('Lojas do cadastro','Registered stores'),'#660099'],['CD',L('Online','Online'),'#0050C8'],['OUTRA',L('Outras lojas Vivo','Other Vivo stores'),'#A86BCB'],['REV',L('Revenda (EA)','Resellers (EA)'),'#E3A21A']];
+    const byCh = {}; S.forEach(x=>{ byCh[x.ch]=(byCh[x.ch]||0)+x.q; });
+    const byP = {}; S.forEach(x=>{ byP[x.p]=(byP[x.p]||0)+x.q; });
+    const P = Object.entries(byP).sort((a,b)=>b[1]-a[1]); const mxP = Math.max(1, ...P.map(x=>x[1]));
+    const byM = {}; A.forEach(x=>{ const m=x.d.slice(0,7); byM[m]=(byM[m]||0)+x.q; }); const mxM = Math.max(1, ...Object.values(byM));
+    const nm = p=> p.replace('JOVI ','').replace(/ 5G/,'').replace(/ (\d+GB)$/,' $1');
+    const pc = v=> tot ? (v/tot*100).toFixed(1).replace('.', EN?'.':',')+'%' : '0%';
+    const per = vtSel==='all' ? `${L('desde a 1ª venda','since the 1st sale')} · ${dd(first)} ${L('a','to')} ${dd(last)}` : `${lab(vtSel).replace('*','')} · ${vtSel===curM?L(`até ${dd(ref)} (mês em andamento)`,`through ${dd(ref)} (month in progress)`):L('mês fechado','closed month')}`;
+    el.innerHTML = `<div class="panel-head" style="align-items:center; margin-bottom:10px;"><div><div class="panel-title">${L('Venda total','Total sales')}</div><div class="panel-note">${L('Só aparelhos (sem acessórios), toda a venda Vivo','Phones only (no accessories), all Vivo sales')}${regionalFilter?` · ${L('regional','branch')} ${regionalFilter}`:''}${modelFilter?` · ${nm(modelFilter)}`:''}</div></div>
+        <div class="vt-chips"><button type="button" data-m="all" class="${vtSel==='all'?'on':''}">${L('Total','Total')}</button>${months.map(m=>`<button type="button" data-m="${m}" class="${vtSel===m?'on':''}">${lab(m)}</button>`).join('')}</div></div>
+      <div class="vt-grid">
+        <div class="vt-main"><span class="vt-l">${vtSel==='all'?L('Total vendido','Total sold'):L('Vendido no mês','Sold in the month')}</span><b>${fmtInt(tot)}</b><small>${L('un.','units')} · ${per}</small>
+          <div class="vt-stack">${CH.filter(([k])=>byCh[k]).map(([k,,c])=>`<i style="width:${(byCh[k]/tot*100).toFixed(2)}%; background:${c};"></i>`).join('')}</div>
+          <div class="vt-ch">${CH.filter(([k])=>byCh[k]).map(([k,l,c])=>`<div><span class="vt-d" style="background:${c}"></span><span>${l}</span><b>${fmtInt(byCh[k])}</b><em>${pc(byCh[k])}</em></div>`).join('')}</div></div>
+        <div class="vt-mod"><span class="vt-l">${L('Por modelo','By model')}</span>${P.map(([p,v])=>`<div class="vt-r"><span>${nm(p)}</span><span class="vt-b"><i style="width:${(v/mxP*100).toFixed(1)}%"></i></span><b>${fmtInt(v)}</b><em>${pc(v)}</em></div>`).join('')}</div>
+        <div class="vt-mes"><span class="vt-l">${L('Mês a mês','Month by month')}</span><div class="vt-bars">${months.map(m=>`<button type="button" data-m="${m}" class="vt-bc${vtSel===m?' on':''}" title="${lab(m)}: ${fmtInt(byM[m])} ${L('un.','units')}"><b>${fmtInt(byM[m])}</b><i style="height:${Math.max(3,byM[m]/mxM*100).toFixed(1)}%"></i><span>${lab(m)}</span></button>`).join('')}</div></div>
+      </div>`;
+    el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ vtSel = (b.dataset.m===vtSel && b.dataset.m!=='all') ? 'all' : b.dataset.m; renderVendaTotal(); });
+  }
   // ---------------- GRADE DE KPIs DETALHADA (estilo Magalu) ----------------
   function renderStockflowKPIs(stores){
     const m = DATA.meta;
@@ -11386,6 +11435,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       ['Visão geral', ()=>renderOverview(stores)],
       ['S&OE', ()=>renderSOE(stores)],
       ['Visão por modelo', ()=>renderModelOverviewTable()],
+      ['Venda total', ()=>renderVendaTotal()],
       ['KPIs de stock flow', ()=>renderStockflowKPIs(stores)],
       ['Dia a dia', ()=>renderDayByDay(stores)],
       ['Visão mensal', ()=>renderMensalExtras(stores, weekdayShape)],
