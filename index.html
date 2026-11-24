@@ -683,6 +683,8 @@
   table.bv tr.bv-tot td.bv-act b{background:transparent;}
   table.bv tr.bv-tot td.bv-act .bv-up{color:#9FF0C9 !important;}
   table.bv .bv-of{font-size:9px; opacity:.7;}
+  table.bv .bv-ns{color:#8A8A90; font-weight:600; font-size:9px; font-style:italic;}
+  table.bv tr.bv-tot .bv-ns{color:#DCDCE0;}
   .bv-ov .bv-pot{background:#F7F1FB;}
   .oj-pers{display:flex; flex-direction:column; gap:5px; margin-top:8px;}
   .oj-per{display:grid; grid-template-columns:96px 1fr 52px; gap:8px; align-items:center;}
@@ -2107,12 +2109,12 @@
       <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
         <div class="mt-seg" id="bv-month"></div>
         <button class="btn-toggle" id="bv-sum-toggle" type="button" aria-pressed="false" title="Mostra ou esconde o resumo em texto, com seletor de semana">Resumo</button>
-        <button class="btn-toggle" id="bv-fit" type="button" aria-pressed="true">Ajustar à largura da tela</button>
+        <button class="btn-toggle" id="bv-fit" type="button" aria-pressed="true" style="display:none;">Ajustar à largura da tela</button>
         <button class="mt-open" id="bv-metas" type="button">🎯 Metas do mês</button>
-        <button class="btn-toggle" id="bv-reset" type="button" title="Volta os targets do mês atual para a meta de referência (setembro/26) ou zero">Restaurar targets</button>
-        <button class="btn-toggle" id="bv-copy" type="button" title="Copia os targets atuais (os que você editou nesta tabela) pra você me mandar de volta">Copiar targets</button>
-        <button class="btn-toggle" id="bv-template" type="button" title="Baixa um Excel com a tabela de branch × modelo, já preenchido com os targets atuais do mês, pra editar e subir de volta">Baixar modelo</button>
-        <button class="btn-toggle" id="bv-upload" type="button" title="Sobe um Excel (mesmo formato do modelo) com a meta do mês vigente, por branch e modelo">Enviar meta (Excel)</button>
+        <button class="btn-toggle" id="bv-reset" type="button" style="display:none;" title="Volta os targets do mês atual para a meta de referência (setembro/26) ou zero">Restaurar targets</button>
+        <button class="btn-toggle" id="bv-copy" type="button" style="display:none;" title="Copia os targets atuais (os que você editou nesta tabela) pra você me mandar de volta">Copiar targets</button>
+        <button class="btn-toggle" id="bv-template" type="button" style="display:none;" title="Baixa um Excel com a tabela de branch × modelo, já preenchido com os targets atuais do mês, pra editar e subir de volta">Baixar modelo</button>
+        <button class="btn-toggle" id="bv-upload" type="button" style="display:none;" title="Sobe um Excel (mesmo formato do modelo) com a meta do mês vigente, por branch e modelo">Enviar meta (Excel)</button>
         <input type="file" id="bv-upload-input" accept=".xlsx,.xls" style="display:none;">
       </div>
     </div>
@@ -2130,7 +2132,7 @@
     </div>
     <div id="bv-wrap"><table class="bv" id="bv-table"></table></div>
     <div class="bv-overall" id="bv-overall"></div>
-    <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 ou sem venda (999).</div>
+    <div class="panel-note" style="margin-top:8px;">Cadastre os TARGETs no botão <b>Metas do mês</b>, suba um Excel em <b>Enviar meta</b> ou edite direto na tabela (ficam salvos neste navegador, por mês). DoS: preto = sem estoque, verde &lt; 60 dias, amarelo 60–90, vermelho &gt; 90 dias ou sem venda nas últimas 4 semanas (s/ venda); acima de 999 dias aparece 999+.</div>
   </div>
 
   <div class="view" id="view-metodo">
@@ -8336,8 +8338,8 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   function bvDot(dos, stock){
     let c, v;
     if(!stock){ c='#1F1F1F'; v='0'; }
-    else if(dos===null){ c='#D2322B'; v='999'; }
-    else { v = fmtInt(Math.min(dos,999)); c = dos<60 ? '#3E9C79' : dos<=90 ? '#E3B55A' : '#D2322B'; }
+    else if(dos===null){ c='#D2322B'; v='<span class="bv-ns" title="Tem estoque mas não vendeu nas últimas 4 semanas">s/ venda</span>'; }
+    else { v = dos>=999 ? '999+' : fmtInt(dos); c = dos<60 ? '#3E9C79' : dos<=90 ? '#E3B55A' : '#D2322B'; }
     return `<span class="bv-dot" style="background:${c};"></span>${v}`;
   }
   function renderBranchView(){
@@ -8727,9 +8729,13 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
             <button type="button" class="mt-x" aria-label="Fechar">×</button></div>
           <div class="mt-bar"><label>Mês <select id="mt-month"></select></label>
             <button type="button" class="btn-toggle" id="mt-copy">Copiar do mês anterior</button>
-            <button type="button" class="btn-toggle" id="mt-clear">Limpar</button></div>
+            <button type="button" class="btn-toggle" id="mt-clear">Limpar</button>
+</div>
           <div id="mt-body"></div>
-          <div class="mt-foot"><span id="mt-msg" class="muted"></span><div style="display:flex; gap:8px;">
+          <div class="mt-foot"><div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="btn-toggle" id="mt-xl-dl" title="Baixa um Excel com as metas do mês escolhido, pra preencher e subir de volta">⬇ Baixar Excel</button>
+            <button type="button" class="btn-toggle" id="mt-xl-up" title="Sobe um Excel (mesmo formato) com a meta do mês escolhido">⬆ Enviar Excel</button>
+            <span id="mt-msg" class="muted"></span></div><div style="display:flex; gap:8px;">
             <button type="button" class="btn-toggle mt-cancel">Cancelar</button>
             <button type="button" class="mt-save">Salvar meta</button></div></div></div>`;
         document.body.appendChild(ov);
@@ -8737,6 +8743,9 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         ov.addEventListener('click', e=>{ if(e.target===ov) close(); });
         ov.querySelector('.mt-x').onclick = close; ov.querySelector('.mt-cancel').onclick = close;
         ov.querySelector('#mt-month').onchange = e=>{ curLab = e.target.value; draw(); };
+        const syncMon = ()=>{ if(curLab!==bvMon()){ bvMonth = curLab===DATA.meta.month_label ? null : curLab; bvTargets = null; renderBranchView(); } };
+        ov.querySelector('#mt-xl-dl').onclick = ()=>{ syncMon(); document.getElementById('bv-template').click(); };
+        ov.querySelector('#mt-xl-up').onclick = ()=>{ syncMon(); ov.style.display='none'; document.getElementById('bv-upload').click(); };
         ov.querySelector('#mt-copy').onclick = ()=>{
           const [m,y] = curLab.split('/').map(Number); const d = new Date(Date.UTC(y, m-2, 1));
           const prev = read(labOf(d.getUTCFullYear(), d.getUTCMonth()));
@@ -8754,7 +8763,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         };
         document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ov.style.display!=='none') close(); });
       }
-      curLab = DATA.meta.month_label; draw(); ov.style.display='flex';
+      curLab = bvMon(); draw(); ov.style.display='flex';
       const f = ov.querySelector('input[data-b]'); if(f) f.focus();
     }
     btn.addEventListener('click', open);
