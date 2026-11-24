@@ -93,8 +93,25 @@
   .jm-sl-bar{height:10px; background:var(--surface-100); border-radius:99px; overflow:hidden;} .jm-sl-bar i{display:block; height:100%; border-radius:99px;}
   .jm-sl-v{text-align:right; font-weight:700; color:var(--ink-900); font-variant-numeric:tabular-nums;} .jm-sl-p{text-align:right; color:var(--ink-500); font-variant-numeric:tabular-nums;}
   @media (max-width:700px){ .jm-share{grid-template-columns:1fr;} }
+  .acc-how{background:#F7F1FB; border:1px solid #E6D6F0; border-radius:12px; padding:11px 15px; font-size:12.5px; color:var(--ink-700); line-height:1.5; margin-bottom:12px;} .acc-how b{color:var(--ink-900);}
+  .acc-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;}
+  .acc-card{background:#fff; border:1px solid var(--line-2); border-radius:12px; padding:13px 15px; display:flex; flex-direction:column; gap:10px;} .acc-card.off{background:#FAFAFB; opacity:.8;}
+  .acc-card-h{display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px;}
+  .acc-card-n{display:grid; grid-template-columns:repeat(4,1fr); gap:6px;} .acc-card-n div{display:flex; flex-direction:column;} .acc-card-n span{white-space:nowrap; font-size:9.5px; color:var(--ink-500); text-transform:uppercase; letter-spacing:.04em; font-weight:700;} .acc-card-n b{font-size:20px; font-weight:800; color:var(--ink-900);}
+  .acc-card-f{font-size:12px; color:var(--ink-700);} .acc-bar{height:6px; background:var(--surface-100); border-radius:99px; overflow:hidden; margin-top:5px;} .acc-bar i{display:block; height:100%; background:#660099; border-radius:99px;}
+  .acc-st{display:inline-block; padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:800; white-space:nowrap;} .acc-st.r{background:#FBE6EA; color:#B3261E;} .acc-st.a{background:#FDF0CC; color:#8A5A00;} .acc-st.g{background:#DDF3E3; color:#0A7A2A;} .acc-st.n{background:#EDEDF0; color:#55575E;}
+  .acc-kpis{display:grid; grid-template-columns:1fr 1fr; gap:10px;} .acc-kpi{border:1px solid var(--line-2); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:2px; border-left:4px solid var(--line);} .acc-kpi span{font-size:11px; font-weight:700; color:var(--ink-700);} .acc-kpi b{font-size:24px; font-weight:800; color:var(--ink-900); line-height:1.15;} .acc-kpi small{font-size:11px; color:var(--ink-500);}
+  .acc-kpi.k-hl{border-left-color:#660099; background:#F7F1FB;} .acc-kpi.k-hl b{color:#660099;} .acc-kpi.k-g{border-left-color:#1A9463;} .acc-kpi.k-r{border-left-color:#D2322B;} .acc-kpi.k-r b{color:#B3261E;} .acc-kpi.k-a{border-left-color:#E3A21A;} .acc-kpi{text-align:left;}
+  .acc-rg{display:grid; grid-template-columns:40px minmax(0,1fr) 50px 66px 74px; gap:10px; align-items:center; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line-2);} .acc-rg span:not(.acc-rg-bar){text-align:right; font-variant-numeric:tabular-nums;}
+  .acc-rg-h{font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; letter-spacing:.04em;} .acc-rg-h span:nth-child(2){text-align:left !important;}
+  .acc-rg-bar{position:relative; height:18px; background:var(--surface-100); border-radius:5px; overflow:hidden;} .acc-rg-bar i{display:block; height:100%; background:linear-gradient(90deg,#A86BCB,#660099);} .acc-rg-bar{display:flex; align-items:center; gap:8px; background:none; overflow:visible;} .acc-rg-bar i{flex:0 0 auto; min-width:3px; border-radius:5px;} .acc-rg-bar em{font-style:normal; font-weight:800; font-size:12px; color:var(--ink-900);}
+  .acc-red{color:#B3261E; font-weight:800;}
+  .acc-chips{display:flex; gap:6px; flex-wrap:wrap;} .acc-chips button{font-family:inherit; font-size:11.5px; font-weight:600; border:1px solid var(--line); background:#fff; color:var(--ink-700); border-radius:999px; padding:5px 12px; cursor:pointer;} .acc-chips button b{margin-left:3px;} .acc-chips button.on{background:#660099; border-color:#660099; color:#fff;}
+  table.acc-tb th.r, table.acc-tb td.r{text-align:right;}
   .tg-btn:hover{border-color:#660099; color:#660099;}
-  .tab-btn, .tg-btn{text-transform:capitalize;} .tab-btn.tab-help, .tg-btn[data-g^="ⓘ"]{text-transform:none;}
+  .tab-btn, .tg-btn{text-transform:capitalize;}
+  .tg-btn{background:#F4ECFA; border-color:#E4D2F0; color:#4B0073;} .tg-btn:not(.on):hover{background:#EBDDF6;}
+  .tabwrap .tabs{background:#F4ECFA !important; border-color:#E4D2F0 !important;} .tabwrap .tabs .tab-btn{color:#4B0073;} .tabwrap .tabs .tab-btn:hover{background:#EBDDF6 !important;} .tabwrap .tabs .tab-btn.active{background:#fff !important; color:#660099 !important;} .tab-btn.tab-help, .tg-btn[data-g^="ⓘ"]{text-transform:none;}
   .tg-btn.on{background:#660099; border-color:#660099; color:#fff;}
   .tg-n{display:inline-block; min-width:18px; padding:0 5px; margin-left:4px; border-radius:99px; background:rgba(0,0,0,.08); font-size:10.5px; font-weight:800; line-height:17px; text-align:center;}
   .tg-btn.on .tg-n{background:rgba(255,255,255,.25);}
@@ -1780,37 +1797,28 @@
 
   <!-- ============ ACESSÓRIOS ============ -->
   <div class="view" id="view-acessorios">
-    <div class="panel">
-      <div class="panel-head"><div class="panel-title">Acessórios · Buds Air 3</div><div class="panel-note">Fone TWS, mesma régua de estoque/DoS dos aparelhos</div></div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr>
-            <th data-key="product">Produto</th>
-            <th data-key="sales_30">Sell-out 30d</th>
-            <th data-key="store_stock">Estoque loja</th>
-            <th data-key="cd_stock">Estoque CD</th>
-            <th data-key="n_stores_allowed">Lojas com o item liberado</th>
-            <th data-key="n_stores_zero">Lojas zeradas</th>
-          </tr></thead>
-          <tbody id="acessorios-table-body"></tbody>
-        </table>
+    <div class="acc-how" id="acc-how"></div>
+    <div class="acc-cards" id="acc-cards"></div>
+    <table style="display:none;"><tbody id="acessorios-table-body"></tbody></table>
+
+    <div class="grid-2" style="margin-top:14px; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title" id="acc-reg-t">Por regional · últimos 30 dias</div></div>
+        <div id="acc-reg"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title" id="acc-kpi-t">Resumo · últimos 30 dias</div></div>
+        <div class="acc-kpis" id="acc-kpis"></div>
       </div>
     </div>
+    <canvas id="chart-acc-regional" style="display:none;"></canvas>
 
     <div class="panel" style="margin-top:14px;">
-      <div class="panel-head"><div class="panel-title">Acessórios por regional</div></div>
-      <div class="panel-note">Últimos 30 dias. A barra é o volume; o número em cima é a participação da regional no total nacional de acessórios.</div>
-      <div class="chart-box-lg" style="height:260px;"><canvas id="chart-acc-regional"></canvas></div>
-    </div>
-
-    <div class="panel" style="margin-top:14px;">
-      <div class="panel-head"><div class="panel-title">Acessórios por loja</div></div>
-      <div class="panel-note">Últimos 30 dias. Só lojas com venda de aparelho ou acessório no período. "Vendas sem acessório" é uma estimativa (aparelhos vendidos menos acessórios vendidos, no piso zero) — não é venda casada por transação, já que a base não linka isso.</div>
-      <div class="table-scroll" style="max-height:480px; margin-top:8px;">
-        <table>
-          <thead><tr>
-            <th>Loja</th><th>Regional</th><th>Promotor</th><th>Aparelhos (30d)</th><th>Acessórios (30d)</th><th>Modelo do acessório</th><th>Taxa de anexo</th><th>Vendas sem acessório (estimado)</th>
-          </tr></thead>
+      <div class="panel-head" style="align-items:center;"><div class="panel-title" id="acc-loja-t">Lojas · fone vendido × aparelho vendido</div><div class="acc-chips" id="acc-chips"></div></div>
+      <div class="panel-note" id="acc-loja-note"></div>
+      <div class="table-scroll" style="max-height:520px; margin-top:8px;">
+        <table class="acc-tb">
+          <thead><tr id="acc-loja-head"></tr></thead>
           <tbody id="acc-loja-body"></tbody>
         </table>
       </div>
@@ -6117,52 +6125,71 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   }
 
   let chartAccRegional = null;
+  let accFilt = 'all';
   function renderAcessoriosExtras(stores){
-    // Acessórios por regional
-    const regs = [...new Set(stores.map(s=>s.regional).filter(Boolean))].sort();
-    const accByReg = regs.map(r=>{
-      const rs = stores.filter(s=>s.regional===r);
-      const qty = rs.reduce((a,s)=>a+s.products.filter(p=>p.is_accessory).reduce((x,p)=>x+p.sales_30,0),0);
-      return { r, qty };
-    }).sort((a,b)=>b.qty-a.qty);
-    const totalAcc = Math.max(1, accByReg.reduce((a,x)=>a+x.qty,0));
-    if(chartAccRegional) chartAccRegional.destroy();
-    chartAccRegional = new Chart(document.getElementById('chart-acc-regional'), {
-      type:'bar',
-      data:{ labels:accByReg.map(x=>x.r), datasets:[{ data:accByReg.map(x=>x.qty), backgroundColor:BLUE_L, borderRadius:5, maxBarThickness:36,
-        showLabels:true, labelColor:BLUE, labelFormat:(v,i)=>`${fmtInt(v)} (${Math.round(v/totalAcc*1000)/10}%)` }]},
-      plugins:[dataLabelPlugin],
-      options:{ layout:{padding:{top:20}}, plugins:{legend:{display:false}},
-        scales:{ y:{beginAtZero:true, grid:{display:false}, border:{display:false}, ticks:{maxTicksLimit:5}}, x:{grid:{display:false}} } }
-    });
-
-    // Acessórios mês a mês
+    const EN = (document.documentElement.getAttribute('lang')||'').startsWith('en'), L = (pt,en)=> EN ? en : pt;
+    const f1 = v=> (Math.round(v*10)/10).toString().replace('.', EN?'.':',');
+    const accName = n=> n.replace('FONE TWS JOVI ','').replace('KIT FOTOGRAFIA JOVI ','Kit foto ').replace('JOVI KIT FOTOGRAFIA ','Kit foto ');
+    // 1) como ler
+    document.getElementById('acc-how').innerHTML = `<b>${L('Como ler esta aba','How to read this tab')}</b> · ${L('Acessório (fone e kit de foto) é vendido junto com o aparelho. A conta principal é <b>quantos acessórios saem a cada 10 aparelhos vendidos</b> na mesma loja, nos últimos 30 dias. Se a loja vende aparelho e não vende fone, o primeiro ponto é ver se ela <b>tem fone no estoque</b>.','Accessories (earbuds and photo kit) are sold together with phones. The main number is <b>how many accessories sell for every 10 phones sold</b> in the same store, over the last 30 days. If a store sells phones but no earbuds, first check whether it <b>has earbuds in stock</b>.')}`;
+    // 2) cards por acessório
+    const accP = (DATA.products||[]).filter(p=>p.is_accessory);
+    document.getElementById('acc-cards').innerHTML = accP.map(p=>{
+      const lojasCom = stores.filter(st=>(st.products||[]).some(q=>q.product===p.product && (q.estoque||0)>0)).length;
+      const lib = p.n_stores_allowed||0, tot = (p.store_stock||0)+(p.cd_stock||0);
+      const dos = p.sales_30>0 ? Math.round((p.store_stock||0)/(p.sales_30/30)) : null;
+      const off = tot===0 && p.sales_30===0;
+      const st = off ? `<span class="acc-st n">${L('ainda sem estoque','no stock yet')}</span>` : (lojasCom < lib*0.6 ? `<span class="acc-st r">${L('falta em muitas lojas','missing in many stores')}</span>` : `<span class="acc-st g">${L('em linha','active')}</span>`);
+      return `<div class="acc-card${off?' off':''}"><div class="acc-card-h"><b>${accName(p.product)}</b>${st}</div>
+        <div class="acc-card-n"><div><span>${L('Vendeu (30d)','Sold (30d)')}</span><b>${fmtInt(p.sales_30)}</b></div><div><span>${L('Estoque lojas','Store stock')}</span><b>${fmtInt(p.store_stock)}</b></div><div><span>CD</span><b>${fmtInt(p.cd_stock)}</b></div><div><span>DoS ${L('lojas','stores')}</span><b>${dos===null?'—':fmtInt(dos)}</b></div></div>
+        <div class="acc-card-f">${L('Tem estoque em','In stock at')} <b>${lojasCom}</b> ${L('de','of')} <b>${lib}</b> ${L('lojas liberadas','allowed stores')}<div class="acc-bar"><i style="width:${lib?Math.min(100,lojasCom/lib*100):0}%"></i></div></div></div>`; }).join('');
+    // 3) linhas por loja
+    const rows = stores.map(st=>{
+      const phones = st.products.filter(q=>!q.is_accessory).reduce((a,q)=>a+(q.sales_30||0),0);
+      const accs = st.products.filter(q=>q.is_accessory);
+      const accSales = accs.reduce((a,q)=>a+(q.sales_30||0),0), accStock = accs.reduce((a,q)=>a+(q.estoque||0),0);
+      const accTr = accs.reduce((a,q)=>a+(q.transferencia||0),0);
+      const per10 = phones>0 ? accSales/phones*10 : null;
+      const sit = accSales>0 ? 'ok' : (accStock>0 ? 'nao' : 'sem');
+      return {st, phones, accSales, accStock, accTr, per10, sit, det: accs.filter(q=>(q.sales_30||0)>0).map(q=>`${accName(q.product)}: ${q.sales_30}`).join(', ')};
+    }).filter(r=>r.phones>0 || r.accSales>0);
+    const tP = rows.reduce((a,r)=>a+r.phones,0), tA = rows.reduce((a,r)=>a+r.accSales,0);
+    const nSem = rows.filter(r=>r.sit==='sem' && r.phones>0).length, nNao = rows.filter(r=>r.sit==='nao' && r.phones>0).length, nOk = rows.filter(r=>r.sit==='ok').length;
+    const kp = (l,v,sub,cls)=>`<div class="acc-kpi${cls?' '+cls:''}"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`;
+    document.getElementById('acc-kpis').innerHTML =
+        kp(L('Acessórios a cada 10 aparelhos','Accessories per 10 phones'), tP?f1(tA/tP*10):'—', `${fmtInt(tA)} ${L('acessórios','accessories')} ÷ ${fmtInt(tP)} ${L('aparelhos','phones')}`, 'k-hl')
+      + kp(L('Lojas vendendo acessório','Stores selling accessories'), fmtInt(nOk), L('venderam pelo menos 1 em 30 dias','sold at least 1 in 30 days'), 'k-g')
+      + kp(L('Venderam aparelho, sem fone no estoque','Sold phones, no earbuds in stock'), fmtInt(nSem), L('precisam de envio de acessório','need accessory shipment'), 'k-r')
+      + kp(L('Têm fone e não venderam','Have earbuds, sold none'), fmtInt(nNao), L('estoque parado: falar com a loja / promotor','stuck stock: talk to store / promoter'), 'k-a');
+    // 4) por regional (barras)
+    const regs = [...new Set(rows.map(r=>r.st.regional).filter(Boolean))];
+    const RG = regs.map(g=>{ const rr = rows.filter(r=>r.st.regional===g); const p = rr.reduce((a,r)=>a+r.phones,0), ac = rr.reduce((a,r)=>a+r.accSales,0); return {g, p, ac, per: p?ac/p*10:0, sem: rr.filter(r=>r.sit==='sem' && r.phones>0).length}; }).sort((a,b)=>b.per-a.per);
+    const mx = Math.max(1, ...RG.map(x=>x.per));
+    document.getElementById('acc-reg').innerHTML = `<div class="acc-rg acc-rg-h"><span>${L('Regional','Regional')}</span><span>${L('acessórios a cada 10 aparelhos','accessories per 10 phones')}</span><span>${L('Acess.','Acc.')}</span><span>${L('Aparelhos','Phones')}</span><span>${L('Lojas s/ fone','Stores w/o earbuds')}</span></div>`
+      + RG.map(x=>`<div class="acc-rg"><b>${x.g}</b><span class="acc-rg-bar"><i style="width:${(x.per/mx*80).toFixed(1)}%"></i><em>${f1(x.per)}</em></span><span>${fmtInt(x.ac)}</span><span>${fmtInt(x.p)}</span><span class="${x.sem?'acc-red':''}">${fmtInt(x.sem)}</span></div>`).join('');
+    // 5) tabela de lojas com filtro
+    const SIT = {sem:[L('Sem fone no estoque','No earbuds in stock'),'r'], nao:[L('Tem fone, não vendeu','Has earbuds, sold none'),'a'], ok:[L('Vendendo','Selling'),'g']};
+    const chips = [['all',L('Todas','All'),rows.length],['sem',SIT.sem[0],rows.filter(r=>r.sit==='sem').length],['nao',SIT.nao[0],rows.filter(r=>r.sit==='nao').length],['ok',SIT.ok[0],nOk]];
+    const ce = document.getElementById('acc-chips');
+    ce.innerHTML = chips.map(([k,l,n])=>`<button type="button" data-k="${k}" class="${accFilt===k?'on':''}">${l} <b>${n}</b></button>`).join('');
+    ce.querySelectorAll('button').forEach(b=>b.onclick=()=>{ accFilt=b.dataset.k; renderAcessoriosExtras(stores); });
+    document.getElementById('acc-loja-note').textContent = L('Lojas que venderam aparelho ou acessório nos últimos 30 dias. Ordem: quem mais vendeu aparelho primeiro.','Stores that sold phones or accessories in the last 30 days, most phones sold first.');
+    document.getElementById('acc-loja-head').innerHTML = `<th>${L('Loja','Store')}</th><th>${L('Regional','Regional')}</th><th>${L('Promotor','Promoter')}</th><th class="r">${L('Aparelhos (30d)','Phones (30d)')}</th><th class="r">${L('Acessórios (30d)','Accessories (30d)')}</th><th class="r">${L('A cada 10 aparelhos','Per 10 phones')}</th><th class="r">${L('Fone na loja','Earbuds in store')}</th><th>${L('Situação','Status')}</th>`;
+    const vis = rows.filter(r=>accFilt==='all' || r.sit===accFilt).sort((a,b)=>b.phones-a.phones || b.accSales-a.accSales);
+    document.getElementById('acc-loja-body').innerHTML = vis.map(r=>`<tr>
+        <td><div class="store-name">${r.st.name}</div><div class="store-code">${r.st.code}</div></td>
+        <td>${r.st.regional||'—'}</td>
+        <td>${r.st.promotor?`<span class="badge badge-blue">${r.st.promotor==='FULL TIME'?'Full time':'Part time'}</span>`:`<span class="badge badge-gray">${L('Sem promotor','No promoter')}</span>`}</td>
+        <td class="r">${fmtInt(r.phones)}</td>
+        <td class="r"${r.det?` title="${r.det}"`:''}><b>${fmtInt(r.accSales)}</b></td>
+        <td class="r">${r.per10===null?'—':f1(r.per10)}</td>
+        <td class="r">${r.accStock>0?fmtInt(r.accStock):`<span class="acc-red">0</span>`}${r.accTr>0?` <span class="muted" style="font-size:10.5px;">+${r.accTr} ${L('a caminho','in transit')}</span>`:''}</td>
+        <td><span class="acc-st ${SIT[r.sit][1]}">${SIT[r.sit][0]}</span></td></tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center; padding:16px;">${L('Nenhuma loja neste filtro.','No stores in this filter.')}</td></tr>`;
+    // títulos
+    document.getElementById('acc-reg-t').textContent = L('Por regional · últimos 30 dias','By regional · last 30 days');
+    document.getElementById('acc-kpi-t').textContent = L('Resumo · últimos 30 dias','Summary · last 30 days');
+    document.getElementById('acc-loja-t').textContent = L('Lojas · acessório vendido × aparelho vendido','Stores · accessories sold × phones sold');
     renderAccInMonth();
-
-    // Acessórios por loja
-    const rows = stores.map(s=>{
-      const phoneSales = s.products.filter(p=>!p.is_accessory).reduce((a,p)=>a+p.sales_30,0);
-      const accProds = s.products.filter(p=>p.is_accessory && p.sales_30>0);
-      const accSales = accProds.reduce((a,p)=>a+p.sales_30,0);
-      const gap = Math.max(0, phoneSales-accSales);
-      const attach = phoneSales>0 ? Math.round(accSales/phoneSales*1000)/10 : null;
-      const accLabel = accProds.length
-        ? accProds.map(p=>`${p.product.replace('FONE TWS JOVI ','').replace('JOVI KIT FOTOGRAFIA ','Kit ')}: ${fmtInt(p.sales_30)}`).join(', ')
-        : '—';
-      return { s, phoneSales, accSales, accLabel, gap, attach };
-    }).filter(r=>r.phoneSales>0 || r.accSales>0).sort((a,b)=>b.gap-a.gap);
-
-    document.getElementById('acc-loja-body').innerHTML = rows.map(r=>`
-      <tr>
-        <td><div class="store-name">${r.s.name}</div><div class="store-code">${r.s.code}</div></td>
-        <td>${r.s.regional||'—'}</td>
-        <td>${r.s.promotor?`<span class="badge badge-blue">${r.s.promotor==='FULL TIME'?'Full time':'Part time'}</span>`:'<span class="badge badge-gray">Sem promotor</span>'}</td>
-        <td>${fmtInt(r.phoneSales)}</td>
-        <td>${fmtInt(r.accSales)}</td>
-        <td style="${r.accLabel==='—'?'':'font-size:11.5px;'}">${r.accLabel}</td>
-        <td>${r.attach!==null?r.attach.toString().replace('.',',')+'%':'—'}</td>
-        <td style="${r.gap>0?'color:var(--red-600); font-weight:700;':''}">${fmtInt(r.gap)}</td>
-      </tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center; padding:16px;">Nenhuma loja com venda no período.</td></tr>`;
   }
 
   // pega o total de um mês respeitando os filtros ativos — usa o detalhamento por regional
@@ -11921,7 +11948,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
 
   document.querySelectorAll('.tab-btn[data-view="relvivo"]').forEach(b=>b.addEventListener('click', ()=>{ try{ renderRelVivo(); }catch(e){ console.error(e); } }));
   document.addEventListener('click', e=>{ const xb = e.target.closest && e.target.closest('.xlreg-btn'); if(xb){ e.preventDefault(); exportEstoqueRegional(xb); } });
-  document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#lang-toggle button[data-l]')) setTimeout(()=>{ try{ renderBranchView(); }catch(err){} try{ if(document.getElementById('rv-page').innerHTML) renderRelVivo(); }catch(err){ console.error(err); } }, 80); });
+  document.addEventListener('click', e=>{ if(e.target.closest && e.target.closest('#lang-toggle button[data-l]')) setTimeout(()=>{ try{ renderBranchView(); }catch(err){} try{ renderAcessoriosExtras(baseStores()); }catch(err){} try{ if(document.getElementById('rv-page').innerHTML) renderRelVivo(); }catch(err){ console.error(err); } }, 80); });
   // ---------------- DESTAQUES (Visão Geral) ----------------
   function renderDestaques(){
     const box = document.getElementById('dq-list'); if(!box) return;
