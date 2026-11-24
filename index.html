@@ -115,6 +115,17 @@
   .rvp-d{width:10px; height:10px; border-radius:3px;} .rvp-n{font-weight:700; color:var(--ink-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .rvp-b{height:8px; background:var(--surface-100); border-radius:99px; overflow:hidden;} .rvp-b i{display:block; height:100%; border-radius:99px;}
   .rvp-v{text-align:right; font-weight:700; color:var(--ink-900); font-variant-numeric:tabular-nums;} .rvp-p{text-align:right; color:var(--ink-500); font-variant-numeric:tabular-nums;}
+  .oj-perf{margin-top:14px;} .oj-perf-t{font-weight:800; font-size:13px; color:var(--ink-900); margin:4px 0 6px;}
+  table.oj-perf-tb{border-collapse:collapse; width:100%; font-size:12.5px; font-variant-numeric:tabular-nums;}
+  table.oj-perf-tb th, table.oj-perf-tb td{border:1px solid #D0D0D4; padding:5px 6px; text-align:center; white-space:nowrap;}
+  table.oj-perf-tb thead th{position:static; background:var(--ojh,#EFE3F7); color:#12151c; font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:800; letter-spacing:0; text-transform:none; line-height:1.2; cursor:default;}
+  table.oj-perf-tb thead th small{display:block; font-weight:700; font-size:10.5px; color:var(--ink-700);}
+  table.oj-perf-tb thead th.oj-perf-band{color:#fff; font-size:14px; padding:8px;}
+  table.oj-perf-tb tbody td:first-child{font-size:13px;}
+  table.oj-perf-tb tr.oj-perf-tot td{background:var(--surface-100); font-weight:800;}
+  .oj-pc{display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:10px 12px; background:#F7F1FB; border:1px solid #E6D6F0; border-radius:10px; margin:0 0 4px; font-size:12px;}
+  .ojp-seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:#fff;} .ojp-seg button{font-family:inherit; font-size:12px; font-weight:600; padding:6px 14px; border:none; background:transparent; color:var(--ink-700); cursor:pointer;} .ojp-seg button.on{background:#660099; color:#fff;}
+  .ojp-months{display:flex; gap:6px; flex-wrap:wrap;} .ojp-months button{font-family:inherit; font-size:11.5px; font-weight:700; padding:5px 11px; border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--ink-700); cursor:pointer;} .ojp-months button.on{background:#660099; border-color:#660099; color:#fff;}
   .tg-btn:hover{border-color:#660099; color:#660099;}
   .tab-btn, .tg-btn{text-transform:capitalize;}
   .tg-btn{background:#F4ECFA; border-color:#E4D2F0; color:#4B0073;} .tg-btn:not(.on):hover{background:#EBDDF6;}
@@ -8222,6 +8233,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
     const SH = { brands: SHALL.brands, rows: P[ojPeriod].rows };
     const storeBy = {}; DATA.stores.forEach(s=>storeBy[s.code]=s);
     ojRenderTrend(P, storeBy);
+    { const tb = document.getElementById('oj-trend'); if(tb) tb.insertAdjacentHTML('beforeend', ojPerfTables(P, storeBy)); }
     const firstIdx = 0;
     const firstBy = {}; P[firstIdx].rows.forEach(r=>{ firstBy[r.name]=r; });
     const rowsAll = SH.rows.map(r=>({...r, s: r.key ? storeBy[r.key] : null}))
@@ -8309,6 +8321,64 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   }
 
   // evolução no ano: share das marcas por período, Jovi × OPPO, share Jovi por regional
+  // "Performance comparison within Vivo": quanto cada regional representa do total (mercado Vivo e cada marca), mês a mês
+  let ojPerfMode = 'share', ojPerfSel = null;
+  window.__ojPerf = (k, v)=>{ try{
+    if(k==='mode') ojPerfMode = v;
+    else if(k==='all') ojPerfSel = null;
+    else if(k==='m'){ const all = window.__ojPerfAll||[]; const cur = new Set(ojPerfSel||all); cur.has(v) ? cur.delete(v) : cur.add(v); if(!cur.size) cur.add(v); ojPerfSel = all.filter(x=>cur.has(x)); if(ojPerfSel.length===all.length) ojPerfSel=null; }
+    const y = window.scrollY; renderOppoJovi(); window.scrollTo(0,y);
+  }catch(e){ console.error(e); } };
+  function ojPerfTables(Pall, storeBy){
+    const EN = (document.documentElement.getAttribute('lang')||'').startsWith('en'), L = (pt,en)=> EN ? en : pt;
+    const REG = ['SP','SE','S','NE','N','MW'];
+    const MPT = {Jan:'JAN',Fev:'FEV',Mar:'MAR',Abr:'ABR',Mai:'MAI',Jun:'JUN',Jul:'JUL',Ago:'AGO',Set:'SET',Out:'OUT',Nov:'NOV',Dez:'DEZ'};
+    const MEN = {Jan:'JAN',Fev:'FEB',Mar:'MAR',Abr:'APR',Mai:'MAY',Jun:'JUN',Jul:'JUL',Ago:'AUG',Set:'SEP',Out:'OCT',Nov:'NOV',Dez:'DEC'};
+    const yrs = new Set(Pall.map(p=>(p.short||'').split('/')[1]));
+    const nome = p=>{ const [m,y] = (p.short||'').split('/'); const mm = (EN?MEN:MPT)[m] || m; return yrs.size>1 ? `${mm}/${y}` : mm; };
+    window.__ojPerfAll = Pall.map(p=>p.label);
+    const P = ojPerfSel ? Pall.filter(p=>ojPerfSel.includes(p.label)) : Pall;
+    const VOL = ojPerfMode==='vol';
+    const f1 = v=>v.toFixed(1).replace('.', EN?'.':','), f2 = v=>v.toFixed(2).replace('.', EN?'.':',');
+    const dist = brand => REG.map(g=>({g, c:P.map(p=>{ let a=0,t=0; p.rows.forEach(r=>{ const st=r.key?storeBy[r.key]:null; const q = brand ? (r.by[brand]||0) : r.total; t+=q; if(st && st.regional===g) a+=q; }); return {u:a, v:t>0?a/t*100:null}; })}));
+    const tabela = (titulo, faixa, cor, brand, hdr)=>{
+      const R0 = dist(brand), n = P.length;
+      const Rw = R0.map(r=>({g:r.g, v:r.c.map(c=> VOL ? c.u : c.v)}));
+      const totU = P.map((p,i)=>R0.reduce((a,r)=>a+r.c[i].u,0));
+      const all = Rw.flatMap(r=>r.v.filter(v=>v!==null)); if(!all.length) return '';
+      const lo = Math.min(...all), hi = Math.max(...all), srt=[...all].sort((a,b)=>a-b), med=srt[Math.floor(srt.length/2)];
+      const bg = v=>{ if(v===null) return ''; const t = v<=med ? (med>lo ? .5*(v-lo)/(med-lo) : .5) : (hi>med ? .5+.5*(v-med)/(hi-med) : .5); return `background:hsl(${Math.round(t*120)}, 62%, ${Math.round(74 - 8*Math.abs(t-.5))}%);`; };
+      const up = '<span style="color:#1A9463; font-size:15px;">▲</span>', dn = '<span style="color:#D2322B; font-size:15px;">▼</span>', fl = '<span style="color:#E3A21A; font-size:15px;">➜</span>';
+      const seta = d=> d===null ? '' : VOL ? (d>=5 ? up : d<=-5 ? dn : fl) : (d>=0.15 ? up : d<=-0.3 ? dn : fl);
+      const mxm = v=>{ if(n<2) return null; const last=v[n-1], prev=v[n-2]; if(last==null||prev==null) return null; return VOL ? (prev>0 ? (last-prev)/prev*100 : null) : last-prev; };
+      const m3 = v=>{ const u=v.slice(-3).filter(x=>x!==null); return u.length ? u.reduce((a,b)=>a+b,0)/u.length : null; };
+      const cel = x=> x===null ? '—' : VOL ? fmtInt(x) : f2(x)+'%';
+      const linha = (g, v, total)=>{ const d=mxm(v), m=m3(v);
+        return `<tr${total?' class="oj-perf-tot"':''}><td><b>${g}</b></td>${v.map(x=>`<td style="${total?'':bg(x)}">${cel(x)}</td>`).join('')}<td style="white-space:nowrap;">${seta(d)} ${d===null?'—':(VOL&&d>0?'+':'')+f1(Math.abs(d)<0.05?0:d)+'%'}</td><td><b>${m===null?'—':VOL?fmtInt(Math.round(m)):f1(m)+'%'}</b></td></tr>`; };
+      return `<div class="oj-perf"><div class="oj-perf-t">${titulo}</div>
+        <div class="table-scroll" style="max-height:none;"><table class="oj-perf-tb"><thead>
+          <tr><th colspan="${n+3}" class="oj-perf-band" style="background:${cor};">${faixa}</th></tr>
+          <tr style="--ojh:${hdr}"><th>BRANCH</th>${P.map(p=>`<th title="${p.label}">${VOL?'VOLUME':'SHARE'}<small>${nome(p)}${p.parcial?'*':''}</small></th>`).join('')}<th>MxM</th><th>${L('MÉDIA 3 M','3-MONTH AVG')}</th></tr></thead><tbody>
+          ${Rw.map(r=>linha(r.g, r.v)).join('')}${VOL?linha('Total', totU, true):''}
+        </tbody></table></div></div>`; };
+    const sel = new Set(P.map(p=>p.label));
+    const ctrl = `<div class="oj-pc">
+        <div class="ojp-seg" role="group"><button type="button" class="${VOL?'':'on'}" onclick="__ojPerf('mode','share')">Share %</button><button type="button" class="${VOL?'on':''}" onclick="__ojPerf('mode','vol')">${L('Volume (un.)','Volume (units)')}</button></div>
+        <div class="ojp-months">${Pall.map(p=>`<button type="button" class="${sel.has(p.label)?'on':''}" title="${p.label}" onclick="__ojPerf('m', ${JSON.stringify(p.label).replace(/"/g,'&quot;')})">${nome(p)}${p.parcial?'*':''}</button>`).join('')}</div>
+        <button type="button" class="btn-toggle" onclick="__ojPerf('all')">${L('Todos os meses','All months')}</button></div>`;
+    return `<div class="panel" style="margin-top:14px;" data-noi18n><div class="panel-head"><div><div class="panel-title">${L('Performance por regional dentro da Vivo','Performance by regional within Vivo')}</div>
+        <div class="panel-note">${VOL
+          ? L('Unidades vendidas em cada regional, mês a mês, nas lojas Vivo do cadastro. Primeiro o mercado Vivo (todas as marcas); depois cada marca. MxM = variação % do último mês escolhido sobre o anterior; Média 3 M = média de unidades dos três últimos meses escolhidos.','Units sold in each regional, month by month, in the registered Vivo stores. First the Vivo market (all brands), then each brand. MxM = % change of the last selected month vs the previous one; 3-month avg = average units of the last three selected months.')
+          : L('Quanto cada regional representa do total vendido nas lojas Vivo do cadastro, mês a mês. Primeiro o mercado Vivo (todas as marcas); depois cada marca sozinha (quanto de cada marca saiu em cada regional). MxM = último mês escolhido menos o anterior (p.p.); Média 3 M = média dos três últimos meses escolhidos.','How much each regional represents of the total sold in the registered Vivo stores, month by month. First the Vivo market (all brands), then each brand on its own. MxM = last selected month minus the previous one (p.p.); 3-month avg = average of the last three selected months.')}
+          ${L('Cor por tabela: verde = maior, vermelho = menor. Clique nos meses para escolher quais entram. Não segue o filtro de regional.','Colors per table: green = highest, red = lowest. Click the months to choose which ones count. Does not follow the regional filter.')}</div></div></div>
+      ${ctrl}
+      ${tabela('Performance comparison within Vivo','VIVO','#660099',null,'#EFE3F7')}
+      ${tabela('JOVI performance comparison within Vivo','JOVI','#1E46E6','JOVI','#DCE4FB')}
+      ${tabela('OPPO comparative analysis within Vivo','OPPO','#00B050','OPPO','#C6EFCE')}
+      ${tabela('SAMSUNG comparative analysis within Vivo','SAMSUNG','#1428A0','SAMSUNG','#D9DEF2')}
+      ${tabela('APPLE comparative analysis within Vivo','APPLE','#3A3A3C','APPLE','#E5E5E7')}
+      ${tabela('MOTOROLA comparative analysis within Vivo','MOTOROLA','#5C2D91','MOTOROLA','#E6DDF2')}</div>`;
+  }
   function ojRenderTrend(P, storeBy){
     const host = document.getElementById('oj-trend'); if(!host) return;
     const brands = DATA.share.brands;
