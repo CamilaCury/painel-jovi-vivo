@@ -4617,7 +4617,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         ${card('Projeção de vendas (mês)', 'Quanto o mês fecha se a venda continuar no ritmo médio que teve até agora.',
           'venda no mês ÷ dias corridos × dias do mês',
           `${fmtInt(k.totalMonthProj)} ÷ ${m.days_elapsed} × ${m.days_in_month} = <b>${fmtInt(k.projMonth)} un.</b> A seta compara com ${m.prev_month_label} fechado, somado do mesmo jeito (${fmtInt(k.totalMonthPrevFullProj)} un.).`)}
-        ${card('Sell out 30 dias', 'Quantos aparelhos as 70 lojas do cadastro venderam nos últimos 30 dias, contando até a última venda da base.',
+        ${card('Venda últimos 30 dias (Sell out 30 dias)', 'Quantos aparelhos as 70 lojas do cadastro venderam nos últimos 30 dias, contando até a última venda da base.',
           'soma da venda de '+dd(ini30)+' a '+dd(REF)+' (só lojas do cadastro)',
           `Agora: <b>${fmtInt(k.sales30)} un.</b> A comparação é com os 30 dias anteriores (${dd(ini60)} a ${dd(fim60)}), que somaram ${fmtInt(k.prevSales30)} un.`)}
         ${card('Venda média por dia', 'Base usada nas contas de DoS. É o ritmo das lojas nos últimos 30 dias, não o do mês.',
@@ -5315,7 +5315,10 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
       card('Cluster stores', fmtInt(stores.length), null, `${fmtInt(nSoldLast30)} venderam nos últimos 30 dias`) +
       card('Venda no mês (até ontem)', fmtInt(totalMonthProj), 'un.', `${vendaAteTxt(m.reference_date)} · sem acessórios<br>${quebraMes}`, {highlight:true}) +
       card('Projeção de vendas (mês)', fmtInt(projMonth), 'un.', `vs. ${m.prev_month_label} fechado ${deltaTxt(projVsPrev)}`, {highlight:true}) +
-      card('Sell out 30 dias', fmtInt(sales30), 'un.', `${deltaTxt(sellGrowth)} vs. 30 dias anteriores`) +
+      (()=>{ const EN=(document.documentElement.getAttribute('lang')||'').startsWith('en'); const r=new Date(m.reference_date+'T00:00:00Z'), i=new Date(r.getTime()-29*86400000), dm=d=>String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0');
+        return card(EN?'Sales last 30 days':'Venda últimos 30 dias', fmtInt(sales30), 'un.', EN
+          ? `${dm(i)} to ${dm(r)} · ${fmtInt(stores.length)} stores only (no online)<br>${deltaTxt(sellGrowth)} vs. previous 30 days (${fmtInt(prevSales30)} units)`
+          : `${dm(i)} a ${dm(r)} · só as ${fmtInt(stores.length)} lojas (sem online)<br>${deltaTxt(sellGrowth)} vs. 30 dias antes (${fmtInt(prevSales30)} un.)`); })() +
       card('Estoque em loja', fmtInt(estoqueLoja), 'un.', `${fmtInt(transito)} un. em trânsito`) +
       (()=>{ const ca = DATA.cdAcc||{total:0,byRegional:{}}; const acc = modelFilter ? 0 : (regionalFilter ? (ca.byRegional[regionalFilter]||0) : ca.total);
         return card('Estoque no CD', fmtInt(estoqueCd+acc), 'un.', `CDs Vivo + dark store · ${fmtInt(estoqueCd)} aparelhos${acc?` + ${fmtInt(acc)} acessórios`:''}`); })() +
