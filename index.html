@@ -4656,7 +4656,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
           'Loja com estoque e sem nenhuma venda em 30 dias aparece sem DoS (—), porque o estoque não gira.')}
         ${card('DoS na Visão por Branch', 'Na Visão por Branch o ritmo é o das 4 últimas semanas (segunda a domingo, a última pode estar em andamento), igual ao relatório semanal.',
           'venda média/dia = venda das 4 semanas ÷ dias do período<br>DoS (inventory) = (loja + trânsito + WH) ÷ venda média/dia<br>DoS (4W) = (loja + trânsito) ÷ venda média/dia',
-          'Cores: verde abaixo de 60 dias, amarelo de 60 a 90, vermelho acima de 90 ou sem venda (999), preto sem estoque. O TARGET vem do botão Metas do mês.')}
+          'Cores: verde abaixo de 60 dias, amarelo de 60 a 90, vermelho acima de 90, preto sem estoque. "s/ venda" = tem estoque mas não vendeu nas 4 semanas; "999+" = mais de 999 dias. O TARGET vem do botão Metas do mês.')}
       </div>
 
       <div class="lg-sec">Ruptura, lojas e produtividade</div>
@@ -4724,18 +4724,18 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         ${card('Planejamento', 'Lançamento e S&OP.',
           'Lançamento: chegada = 1ª foto de estoque com o modelo na loja · sell-through = vendido ÷ (vendido + estoque em loja)',
           'S&OP: forecast = média das últimas 4, 8 ou 12 semanas fechadas (editável por modelo e com ajuste geral); estoque projetado = loja + trânsito + CD de hoje − forecast, sem novas entradas. Cobertura: ruptura < 4 sem, atenção 4–6, saudável 6–16, excesso > 16.')}
-        ${card('Regionais', 'Comparativo Regionais e Branch × Meta.',
-          'ACHIEVE = RESULT do mês ÷ TARGET · DoS (4S) = (loja + trânsito) ÷ venda média diária das 4 semanas',
-          'TARGET pelo botão Metas do mês, pelo Excel ou direto na tabela (fica salvo no navegador, por mês).')}
+        ${card('Regionais', 'Comparativo Regionais e Branch × Meta. Na Branch × Meta o filtro de Mês mostra target, resultado e atingido de cada mês; as semanas são as 4 últimas até o fim do mês escolhido.',
+          'ACHIEVE = RESULT do mês ÷ TARGET · DoS (4S) = (loja + trânsito) ÷ venda média diária das 4 semanas · % ESTQ / % SO = fatia do branch no total do modelo · DELTA = % SO − % ESTQ',
+          'TARGET pelo botão Metas do mês (escolha o mês, digite ou baixe/suba o Excel) ou direto na tabela; fica salvo no navegador, por mês. Em mês fechado, estoque, CD e DoS são a posição de hoje. A legenda completa fica embaixo da tabela.')}
         ${card('Canais', 'Revendas (EA) · Sell-through, Sell Out Retail Vivo e Venda Online.',
           'Revendas: estoque = centers "EA…" em LVUT · venda = lojas "EA…" no sell-out · Online = canal CD + Own Store com código de CD + Dark Store',
           'Sell Out Retail Vivo: mercado de smartphones nas revendas (aba "Loja Parceira (EA)" do comparativo).')}
-        ${card('Concorrência', 'Jovi × Concorrentes: venda de smartphones por loja e fabricante nas 70 lojas do cadastro.',
-          'share = unidades da marca ÷ total de aparelhos da loja',
-          'Fonte: comparativo mensal da Vivo (uma aba por mês fechado).')}
-        ${card('Acessórios (menu Estoque)', 'Buds Air 3, Buds Pro e kit fotografia X300 FE.',
-          'fora de todos os cards e DoS de aparelhos',
-          'Só aparecem na aba Acessórios (e nos cards de CD e Revendas, quando indicado).')}
+        ${card('Concorrência', 'Jovi × Concorrentes: venda de smartphones por loja e fabricante nas lojas do cadastro. Inclui a Performance por regional dentro da Vivo (mercado e cada marca, mês a mês).',
+          'share na loja = unidades da marca ÷ total de aparelhos da loja · share da regional = venda da regional ÷ venda de todas as lojas (no mercado ou só da marca) · MxM = último mês − anterior (p.p.) · Média 3 M = média dos 3 últimos meses escolhidos',
+          'Fonte: comparativo mensal da Vivo (uma aba por mês fechado). Em Volume (un.) o MxM é a variação % e aparece a linha de total. Cor por tabela: verde = maior, vermelho = menor.')}
+        ${card('Acessórios (menu Estoque)', 'Buds Air 3, Buds Pro e kit fotografia X300 FE. A conta principal é quantos acessórios saem a cada 10 aparelhos vendidos na mesma loja (30 dias).',
+          'a cada 10 aparelhos = acessórios vendidos ÷ aparelhos vendidos × 10 · DoS do acessório = estoque nas lojas ÷ (venda 30d ÷ 30)',
+          'Situação da loja: <b>Sem fone no estoque</b> (vendeu aparelho e tem 0 de acessório: precisa de envio), <b>Tem fone, não vendeu</b> (estoque parado) e <b>Vendendo</b>. Acessório fica fora de todos os cards e DoS de aparelhos.')}
       </div>`;
   }
 
@@ -4819,7 +4819,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
           'A store with stock and no sales in 30 days shows no DoS (—), because the stock is not turning.')}
         ${card('DoS in Branch View', 'In Branch View the pace is the last 4 weeks (Monday to Sunday; the last one may be in progress), like the weekly report.',
           'avg daily sales = 4-week sales ÷ days in period<br>DoS (inventory) = (store + transit + WH) ÷ avg daily sales<br>DoS (4W) = (store + transit) ÷ avg daily sales',
-          'Colors: green below 60 days, yellow 60–90, red above 90 or no sales (999), black no stock. TARGET comes from the Monthly targets button.')}
+          'Colors: green below 60 days, yellow 60–90, red above 90, black no stock. "no sales" = has stock but no sales in the 4 weeks; "999+" = over 999 days. TARGET comes from the Monthly targets button.')}
       </div>
 
       <div class="lg-sec">Stock-out, stores and productivity</div>
@@ -4855,6 +4855,9 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
         ${card('Idle in Stores', 'Units in a store with no sale of that model in that store.', 'idle 60+ = no sale in 60 days · idle 30–60 = no sale in 30 days (only if the store has held the model for 30+ days)', 'Suggested destination = an out-of-stock store for the same model in the same DC area or regional.')}
         ${card('Shipment Suggestion', 'Same model as Claro: units per store to cover the chosen days, with growth from a chosen date.', 'avg/day = max(14-day sales ÷ 14, 28-day sales ÷ 28) · target = avg/day × equivalent days · suggestion = target − (stock + transit)', 'Each DC serves the lowest-coverage stores first; "DC shortfall" = what it cannot cover.')}
         ${card('Planning', 'Launch and S&OP.', 'launch: arrival = first stock snapshot with the model in the store · sell-through = sold ÷ (sold + store stock)', 'S&OP forecast = average of the last 4/8/12 closed weeks (editable); projected stock = today\'s stock − forecast, no new receipts.')}
+        ${card('Regionals', 'Regional comparison and Branch × Target. In Branch × Target the Month filter shows each month\'s target, result and achievement; the weeks are the last 4 up to the end of the chosen month.', 'ACHIEVE = month RESULT ÷ TARGET · DoS (4W) = (store + transit) ÷ average daily sales of the 4 weeks · DELTA = % SO − % STOCK', 'Targets via the Monthly targets button (pick the month, type or download/upload the Excel) or directly in the table; saved in this browser, by month. In a closed month, stock, DC and DoS are today\'s position.')}
+        ${card('Competition', 'Jovi × Competitors: smartphone sales by store and brand in the registered stores, plus Performance by regional within Vivo (market and each brand, month by month).', 'regional share = regional sales ÷ sales of all stores (market or brand only) · MxM = last month − previous (p.p.) · 3-month avg = average of the last 3 selected months', 'Source: Vivo monthly comparison file (one sheet per closed month). Colors per table: green = highest, red = lowest.')}
+        ${card('Accessories (Stock menu)', 'Buds Air 3, Buds Pro and X300 FE photo kit. The main number is accessories sold per 10 phones sold in the same store (30 days).', 'per 10 phones = accessories sold ÷ phones sold × 10 · accessory DoS = store stock ÷ (30-day sales ÷ 30)', 'Store status: <b>No earbuds in stock</b> (sold phones, 0 accessories: needs shipment), <b>Has earbuds, sold none</b> (stuck stock) and <b>Selling</b>. Accessories stay out of all phone cards and DoS.')}
         ${card('Promoters', 'Stores with full-time, part-time or no Jovi promoter.', 'units/store = Jovi sales in the month ÷ stores in the group (current month projected)', 'Also crosses with OPPO promoters, by regional, ranking, promoters needing attention and top stores without promoter.')}
       </div>`;
   }
