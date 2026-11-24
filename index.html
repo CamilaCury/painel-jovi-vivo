@@ -8598,11 +8598,15 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   function bvFit(){
     const wrap = document.getElementById('bv-wrap'), tbl = document.getElementById('bv-table'); if(!wrap||!tbl) return;
     const fit = document.getElementById('bv-fit'); tbl.style.zoom = '';
-    if(fit && fit.getAttribute('aria-pressed')==='true'){
-      const avail = wrap.clientWidth, need = tbl.scrollWidth;
-      if(need>avail && avail>0) tbl.style.zoom = (avail/need).toFixed(3);
-    }
+    if(!(fit && fit.getAttribute('aria-pressed')==='true') || !wrap.offsetParent) return;
+    // medidas visuais (já incluem o zoom geral da página), em duas passadas pra fechar certinho na largura do quadro
+    const W = wrap.getBoundingClientRect().width - 2;
+    let T = tbl.getBoundingClientRect().width; if(!(T>0) || !(W>0)) return;
+    let z = Math.min(1, W/T); tbl.style.zoom = z.toFixed(4);
+    T = tbl.getBoundingClientRect().width; if(T>0 && Math.abs(T-W)>1) tbl.style.zoom = Math.min(1, z*W/T).toFixed(4);
   }
+  window.addEventListener('resize', ()=>{ clearTimeout(window.__bvFitT); window.__bvFitT = setTimeout(bvFit, 120); });
+
   (function(){ const f=document.getElementById('bv-fit'); if(f) f.addEventListener('click', ()=>{ f.setAttribute('aria-pressed', f.getAttribute('aria-pressed')==='true'?'false':'true'); bvFit(); });
     const r=document.getElementById('bv-reset'); if(r) r.addEventListener('click', ()=>{ bvTargets=bvDefaults(bvMon()); bvSaveTargets(); renderBranchView(); });
     const stg=document.getElementById('bv-sum-toggle'); if(stg) stg.addEventListener('click', ()=>{ bvSumOpen=!bvSumOpen; renderBranchView(); });
@@ -11915,7 +11919,7 @@ if(typeof module!=='undefined') module.exports = { buildVivoDashboard };
   // ---------------- ZOOM ----------------
   let zoomPct = 100;
   function applyZoom(){
-    document.body.style.zoom = zoomPct+'%';
+    document.body.style.zoom = zoomPct+'%'; setTimeout(()=>{ try{ bvFit(); }catch(e){} }, 30);
     document.getElementById('zoom-val').textContent = zoomPct+'%';
   }
   document.getElementById('zoom-out').addEventListener('click', ()=>{ zoomPct = Math.max(60, zoomPct-10); applyZoom(); });
